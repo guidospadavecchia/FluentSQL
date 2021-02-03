@@ -36,6 +36,7 @@ using (IDbConnection connection = new SqlConnection(CONNECTION_STRING))
 }
 ```
 
+_Note: It is recommended to always wrap the `IFluentSqlQuery` instantiation inside a `using` statement regardless of the overload used._
 ***
 
 ### Select
