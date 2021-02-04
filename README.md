@@ -306,8 +306,6 @@ IEnumerable<Customer> result = query.ExecuteCustomQuery<Customer>("SELECT * FROM
 
 Contributions are welcome! Submit a [pull request](https://github.com/guidospadavecchia/FluentSQL/pulls).
 
-***
-
 ## License
 This proyect is distributed under the [MIT License](https://github.com/guidospadavecchia/FluentSQL/blob/main/LICENSE)
 
