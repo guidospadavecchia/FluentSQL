@@ -1,4 +1,6 @@
-﻿namespace FluentSql.Core
+﻿using System.Threading.Tasks;
+
+namespace FluentSql.Core
 {
     public interface IFluentSqlInsertValuesStatement
     {
@@ -6,5 +8,6 @@
         int? CommandTimeout { get; }
 
         int Execute();
+        Task<int> ExecuteAsync();
     }
 }

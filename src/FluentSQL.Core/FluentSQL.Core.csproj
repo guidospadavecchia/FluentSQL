@@ -6,6 +6,7 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/guidospadavecchia/FluentSQL/tree/main/src/FluentSQL.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/guidospadavecchia/FluentSQL</RepositoryUrl>
+    <RootNamespace>FluentSql.Core</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

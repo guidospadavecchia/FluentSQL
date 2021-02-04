@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace FluentSql.Core
 {
@@ -20,5 +21,9 @@ namespace FluentSql.Core
         int ExecuteNonQuery();
         IEnumerable<dynamic> ExecuteToDynamic();
         IEnumerable<T> ExecuteToMappedObject<T>();
+
+        Task<int> ExecuteNonQueryAsync();
+        Task<IEnumerable<dynamic>> ExecuteToDynamicAsync();
+        Task<IEnumerable<T>> ExecuteToMappedObjectAsync<T>();
     }
 }

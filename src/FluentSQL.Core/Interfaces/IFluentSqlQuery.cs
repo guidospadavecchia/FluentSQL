@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FluentSql.Core
 {
@@ -22,5 +23,12 @@ namespace FluentSql.Core
         IEnumerable<T> ExecuteCustomQuery<T>(string sqlQuery, object parameters);
         int ExecuteCustomNonQuery(string sqlQuery);
         int ExecuteCustomNonQuery(string sqlQuery, object parameters);
+
+        Task<IEnumerable<dynamic>> ExecuteCustomQueryAsync(string sqlQuery);
+        Task<IEnumerable<dynamic>> ExecuteCustomQueryAsync(string sqlQuery, object parameters);
+        Task<IEnumerable<T>> ExecuteCustomQueryAsync<T>(string sqlQuery);
+        Task<IEnumerable<T>> ExecuteCustomQueryAsync<T>(string sqlQuery, object parameters);
+        Task<int> ExecuteCustomNonQueryAsync(string sqlQuery);
+        Task<int> ExecuteCustomNonQueryAsync(string sqlQuery, object parameters);
     }
 }

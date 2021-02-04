@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace FluentSql.Core
 {
@@ -15,8 +16,12 @@ namespace FluentSql.Core
         IFluentSqlExecuteStoredProcedureOutputParameterStatement WithOutputParameter(string name, DbType type, byte precision, byte scale);
         IFluentSqlExecuteStoredProcedureOutputParameterStatement WithOutputParameter(string name, DbType type, int? size = null, byte? precision = null, byte? scale = null);
 
-        int ExecuteNonQuery(out Dictionary<string, object> outputParameters);
-        IEnumerable<dynamic> ExecuteToDynamic(out Dictionary<string, object> outputParameters);
-        IEnumerable<T> ExecuteToMappedObject<T>(out Dictionary<string, object> outputParameters);
+        StoredProcedureWithOutputResult<int> ExecuteNonQuery();
+        StoredProcedureWithOutputResult<IEnumerable<dynamic>> ExecuteToDynamic();
+        StoredProcedureWithOutputResult<IEnumerable<T>> ExecuteToMappedObject<T>();
+
+        Task<StoredProcedureWithOutputResult<int>> ExecuteNonQueryAsync();
+        Task<StoredProcedureWithOutputResult<IEnumerable<dynamic>>> ExecuteToDynamicAsync();
+        Task<StoredProcedureWithOutputResult<IEnumerable<T>>> ExecuteToMappedObjectAsync<T>();
     }
 }

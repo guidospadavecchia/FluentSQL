@@ -1,4 +1,6 @@
-﻿namespace FluentSql.Core
+﻿using System.Threading.Tasks;
+
+namespace FluentSql.Core
 {
     public interface IFluentSqlDeleteStatement
     {
@@ -8,5 +10,6 @@
         IFluentSqlNonQueryWhereStatement Where(string condition);
 
         int Execute();
+        Task<int> ExecuteAsync();
     }
 }
