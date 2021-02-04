@@ -2,9 +2,9 @@
   <img src="https://github.com/guidospadavecchia/FluentSQL/blob/main/design/fsql-logo.png">
 </p>
 
-## Descripción
+## Description
 **FluentSql** is a **.NET Standard** library wrapping [Dapper](https://github.com/StackExchange/Dapper) micro-ORM, and adding a fluent syntax for query building, similar to [Dapper.SqlBuilder](https://www.nuget.org/packages/Dapper.SqlBuilder/) (but different), all in one small package.  
-The FSQL syntax is as similar as SQL syntax as you can get, while using a Fluent API similar to LINQ.
+The **FSQL** syntax is as similar as SQL syntax as you can get, while using a Fluent API which resembles LINQ.
 
 ## Usage
 
@@ -36,6 +36,7 @@ using (IDbConnection connection = new SqlConnection(CONNECTION_STRING))
 }
 ```
 
+_Note: It is recommended to always wrap the `IFluentSqlQuery` instantiation inside a `using` statement regardless of the overload used._
 ***
 
 ### Select
@@ -300,6 +301,13 @@ IEnumerable<Customer> result = query.ExecuteCustomQuery<Customer>("SELECT * FROM
 ```
 
 ***
+
+## Contributions
+
+Contributions are welcome! Submit a [pull request](https://github.com/guidospadavecchia/FluentSQL/pulls).
+
+## License
+This proyect is distributed under the [MIT License](https://github.com/guidospadavecchia/FluentSQL/blob/main/LICENSE)
 
 <p align="center">
   <img src="http://ForTheBadge.com/images/badges/built-with-love.svg">
