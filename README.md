@@ -9,7 +9,7 @@ The **FSQL** syntax is as similar as SQL syntax as you can get, while using a Fl
 ## Packages
 Package | Version | Downloads |
 --- | --- | --- |
-[FluentSql.Core](https://www.nuget.org/packages/FluentSQL.Core/) | [![Version](https://img.shields.io/nuget/v/FluentSQL.Core?style=flat-square)](https://www.nuget.org/packages/FluentSQL.Core/) | [![Downloads](https://img.shields.io/nuget/dt/FluentSQL.Core?color=lightgreen&style=flat-square)](https://www.nuget.org/packages/FluentSQL.Core/) |
+[FluentSQL.Core](https://www.nuget.org/packages/FluentSQL.Core/) | [![Version](https://img.shields.io/nuget/v/FluentSQL.Core?style=flat-square)](https://www.nuget.org/packages/FluentSQL.Core/) | [![Downloads](https://img.shields.io/nuget/dt/FluentSQL.Core?color=lightgreen&style=flat-square)](https://www.nuget.org/packages/FluentSQL.Core/) |
 
 ## Usage
 
