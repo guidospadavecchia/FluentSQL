@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FluentSql.Core
+namespace FluentSQL.Core
 {
     /// <summary>
     /// Represents the result of a Stored Procedure execution with output parameters.

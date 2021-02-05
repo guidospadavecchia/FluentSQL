@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FluentSql.Core
+namespace FluentSQL.Core
 {
     public interface IFluentSqlUpdateStatement
     {

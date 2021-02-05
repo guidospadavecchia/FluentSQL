@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace FluentSql.Core
+namespace FluentSQL.Core
 {
     /// <summary>
     /// Fluent API for SQL queries.

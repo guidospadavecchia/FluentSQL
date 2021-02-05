@@ -1,4 +1,4 @@
-﻿namespace FluentSql.Core
+﻿namespace FluentSQL.Core
 {
     /// <summary>
     /// Specifies the different types of joins.

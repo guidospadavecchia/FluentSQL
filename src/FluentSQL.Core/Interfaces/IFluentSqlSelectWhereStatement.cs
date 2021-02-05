@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace FluentSql.Core
+namespace FluentSQL.Core
 {
     public interface IFluentSqlSelectWhereStatement
     {

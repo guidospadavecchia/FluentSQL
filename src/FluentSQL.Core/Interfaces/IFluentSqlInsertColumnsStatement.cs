@@ -1,4 +1,4 @@
-﻿namespace FluentSql.Core
+﻿namespace FluentSQL.Core
 {
     public interface IFluentSqlInsertColumnsStatement
     {

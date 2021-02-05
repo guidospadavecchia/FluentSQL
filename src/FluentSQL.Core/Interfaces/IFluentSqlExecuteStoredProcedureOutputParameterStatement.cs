@@ -2,7 +2,7 @@
 using System.Data;
 using System.Threading.Tasks;
 
-namespace FluentSql.Core
+namespace FluentSQL.Core
 {
     public interface IFluentSqlExecuteStoredProcedureOutputParameterStatement
     {

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace FluentSql.Core
+namespace FluentSQL.Core
 {
     public interface IFluentSqlNonQueryWhereStatement
     {

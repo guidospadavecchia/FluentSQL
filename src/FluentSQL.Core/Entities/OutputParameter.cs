@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace FluentSql.Core
+namespace FluentSQL.Core
 {
     /// <summary>
     /// Represents an output parameter for a Stored Procedure
