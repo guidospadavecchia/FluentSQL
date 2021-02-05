@@ -3,7 +3,7 @@
 </p>
 
 ## Description
-**FluentSql** is a **.NET Standard** library wrapping [Dapper](https://github.com/StackExchange/Dapper) micro-ORM, and adding a fluent syntax for query building, similar to [Dapper.SqlBuilder](https://www.nuget.org/packages/Dapper.SqlBuilder/) (but different), all in one small package.  
+**FluentSQL** is a **.NET Standard** library wrapping [Dapper](https://github.com/StackExchange/Dapper) micro-ORM, and adding a fluent syntax for query building, similar to [Dapper.SqlBuilder](https://www.nuget.org/packages/Dapper.SqlBuilder/) (but different), all in one small package.  
 The **FSQL** syntax is as similar as SQL syntax as you can get, while using a Fluent API which resembles LINQ.
 
 ## Packages
