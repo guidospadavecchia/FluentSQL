@@ -193,34 +193,52 @@ IEnumerable<Invoice> result = query.StoreProcedure("GetInvoices")
 
 
 ### Non-query execution with output parameters
-Apart from return objects, *Stored Procedures* can return output values through a `Dictionary<string, object>` as an `out` parameter. Calls to `WithOutputParameter()` or `WithOutputParameters()` must be done after all input parameters have been set:
+Apart from return objects, *Stored Procedures* can return output values. In case you have to retrieve output parameters, end methods after calling `WithOutputParameter()` or `WithOutputParameters()` will return a `StoreProcedureWithOutputResult` object, which has two properties: `T ReturnValue` and `Dictionary<string, object> OutputParameters`:
 
-**Non-query execution with output parameters**
 ```csharp
-int affectedRows = query.StoreProcedure("FormatStringDate")
-                                      .WithParameter("Date", DateTime.Now)
-                                      .WithParameter("Prefix", "Valid through ")
-                                      .WithOutputParameter(new OutputParameter("DateTimeSTR", DbType.String, 500))
-                                      .ExecuteNonQuery(out Dictionary<string, object> outputParameters);
-                                      
+public sealed class StoredProcedureWithOutputResult<T>
+{
+    public T ReturnValue { get; private set; }
+    public Dictionary<string, object> OutputParameters { get; private set; }
+}
+```
+
+_Note that calls to `WithOutputParameter()` or `WithOutputParameters()` must be done after all input parameters have been set._
+
+**Non-query execution**
+```csharp
+StoreProcedureWithOutputResult<int> result = query.StoreProcedure("FormatStringDate")
+                                                  .WithParameter("Date", DateTime.Now)
+                                                  .WithParameter("Prefix", "Valid through ")
+                                                  .WithOutputParameter(new OutputParameter("DateTimeSTR", DbType.String, 500))
+                                                  .ExecuteNonQuery();
+//Return value                                             
+int affectedRows = result.ReturnValue;
+//Output parameters
+Dictionary<string, object> outputParameters = result.OutputParameters;
+
 object value = outputParameters.FirstOrDefault()?.Value;
 string formattedResult = Convert.ToString(value);
 ```
 
-**Query execution with output parameters**
+**Query execution**
 ```csharp
-IEnumerable<dynamic> result = query.StoreProcedure("ProcessInvoicesAndReturnCustomers")
-                                   .WithParameter("Date", DateTime.Now)
-                                   .WithOutputParameter(new OutputParameter("InvoicesProcessed", DbType.Int32))
-                                   .ExecuteToDynamic(out Dictionary<string, object> outputParameters);
-// Return values
-dynamic firstCustomer = result.ElementAt(0);
+StoreProcedureWithOutputResult<IEnumerable<dynamic>> result = query.StoreProcedure("ProcessInvoicesAndReturnCustomers")
+                                                                   .WithParameter("Date", DateTime.Now)
+                                                                   .WithOutputParameter(new OutputParameter("InvoicesProcessed", DbType.Int32))
+                                                                   .ExecuteToDynamic();
+//Return value
+IEnumerable<dynamic> returnCollection = result.ReturnValue;
+//Output parameters
+Dictionary<string, object> outputParameters = result.OutputParameters;
 
+// Get dynamic object & values
+dynamic firstCustomer = returnCollection.ElementAt(0);
 int id = firstCustomer.ID;
 string name = firstCustomer.Name;
 string surname = firstCustomer.Surname;                                         
 
-// Output parameter                                      
+// Get output parameter value
 object value = outputParameters.FirstOrDefault()?.Value;
 int invoicesProcessed = Convert.ToInt32(value);
 ```
@@ -233,19 +251,22 @@ public class Customer
     public string Surname;
 }
 
-IEnumerable<Customer> result = query.StoreProcedure("ProcessInvoicesAndReturnCustomers")
-                                    .WithParameter("Date", DateTime.Now)
-                                    .WithOutputParameter(new OutputParameter("InvoicesProcessed", DbType.Int32))
-                                    .ExecuteToMappedObject<Customer>(out Dictionary<string, object> outputParameters);
-                                      
-// Return values
-Customer firstCustomer = result.ElementAt(0);
+StoreProcedureWithOutputResult<IEnumerable<Customer>> result = query.StoreProcedure("ProcessInvoicesAndReturnCustomers")
+                                                                    .WithParameter("Date", DateTime.Now)
+                                                                    .WithOutputParameter(new OutputParameter("InvoicesProcessed", DbType.Int32))
+                                                                    .ExecuteToMappedObject<Customer>();
+//Return value
+IEnumerable<dynamic> returnCollection = result.ReturnValue;
+//Output parameters
+Dictionary<string, object> outputParameters = result.OutputParameters;
 
+// Get mapped object & values
+Customer firstCustomer = returnCollection.ElementAt(0);
 int id = firstCustomer.ID;
 string name = firstCustomer.Name;
 string surname = firstCustomer.Surname;                                         
 
-// Output parameter                                      
+// Get output parameter value
 object value = outputParameters.FirstOrDefault()?.Value;
 int invoicesProcessed = Convert.ToInt32(value);
 ```
@@ -301,6 +322,10 @@ IEnumerable<Customer> result = query.ExecuteCustomQuery<Customer>("SELECT * FROM
 ```
 
 ***
+
+## Async methods
+
+All available end methods can be executed asynchronously. If there's an `Execute()`, there is also an awaitable `ExecuteAsync()`.
 
 ## Contributions
 
