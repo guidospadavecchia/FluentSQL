@@ -7,6 +7,10 @@
     <PackageProjectUrl>https://github.com/guidospadavecchia/FluentSQL/tree/main/src/FluentSQL.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/guidospadavecchia/FluentSQL</RepositoryUrl>
     <RootNamespace>FluentSql.Core</RootNamespace>
+    <Version>1.1.0</Version>
+    <PackageIcon>fsql-logo.png</PackageIcon>
+    <Authors>Guido Spadavecchia</Authors>
+    <Company>Guido Spadavecchia</Company>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\design\fsql-logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
