@@ -6,6 +6,11 @@
 **FluentSql** is a **.NET Standard** library wrapping [Dapper](https://github.com/StackExchange/Dapper) micro-ORM, and adding a fluent syntax for query building, similar to [Dapper.SqlBuilder](https://www.nuget.org/packages/Dapper.SqlBuilder/) (but different), all in one small package.  
 The **FSQL** syntax is as similar as SQL syntax as you can get, while using a Fluent API which resembles LINQ.
 
+## Packages
+Package | Version | Downloads |
+--- | --- | --- |
+[FluentSQL.Core](https://www.nuget.org/packages/FluentSQL.Core/) | [![Version](https://img.shields.io/nuget/v/FluentSQL.Core?style=flat-square)](https://www.nuget.org/packages/FluentSQL.Core/) | [![Downloads](https://img.shields.io/nuget/dt/FluentSQL.Core?color=lightgreen&style=flat-square)](https://www.nuget.org/packages/FluentSQL.Core/) |
+
 ## Usage
 
 ### Connection
