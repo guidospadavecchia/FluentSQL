@@ -57,16 +57,16 @@ IEnumerable<dynamic> result = query.SelectAll().Distinct().Top(100).From("Custom
 #### Full example using all available chaining methods for Select
 ```csharp
 var result = query.Select("C.ID", "C.Name", "C.Surname", "COUNT(I.ID)")
-                     .Distinct()
-                     .Top(10)
-                     .From("Customers", "C")
-                     .Join("Invoices", "I", JoinTypes.Inner)
-                     .On("C.ID = I.CustomerId")
-                     .GroupBy("C.ID", "C.Name", "C.Surname")
-                     .Having("COUNT(I.ID) > 10")
-                     .OrderBy("C.Surname", "C.Name")
-                     .Descending()
-                     .ToDynamic();
+                  .Distinct()
+                  .Top(10)
+                  .From("Customers", "C")
+                  .Join("Invoices", "I", JoinTypes.Inner)
+                  .On("C.ID = I.CustomerId")
+                  .GroupBy("C.ID", "C.Name", "C.Surname")
+                  .Having("COUNT(I.ID) > 10")
+                  .OrderBy("C.Surname", "C.Name")
+                  .Descending()
+                  .ToDynamic();
  ```
  
 #### Return methods
@@ -117,9 +117,9 @@ int affectedRows = query.InsertInto("Currencies")
 Returns the affected rows.
 ```csharp
 int affectedRows = query.Update("Currencies")
-                          .Set("Description = 'U.S. Dollar'", "Code = 'US'")
-                          .Where("ID = 2")
-                          .Execute();
+                        .Set("Description = 'U.S. Dollar'", "Code = 'US'")
+                        .Where("ID = 2")
+                        .Execute();
 ```
 
 ```csharp
@@ -129,17 +129,17 @@ assignments.Add("Description", "U.S. Dollar");
 assignments.Add("Code", "US");
 
 int affectedRows = query.Update("Currencies")
-                          .Set(assignments)
-                          .Where("ID = 2")
-                          .Execute();
+                        .Set(assignments)
+                        .Where("ID = 2")
+                        .Execute();
 ```
 
 ### Delete
 Returns the affected rows.
 ```csharp
 int affectedRows = query.DeleteFrom("Currencies")
-                          .Where("ID = 2")
-                          .Execute();
+                        .Where("ID = 2")
+                        .Execute();
 ```
 
 ***
