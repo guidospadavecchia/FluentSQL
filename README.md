@@ -173,7 +173,7 @@ int affectedRows = query.StoreProcedure("ProcessCustomerInvoices")
 ```
 
 ### Query executions
-Similar to `Select()` method, *Stored Procedures* can return a collection of dynamic objects (`IEnumerable<dynamic>`) or map to a collection of DTO objects (`IEnumerable<T>`):
+Similar to `Select()` method, *Stored Procedures* can return a collection of dynamic objects (`IEnumerable<dynamic>`) or map to a collection of DTOs (`IEnumerable<T>`):
 
 ```csharp
 IEnumerable<dynamic> result = query.StoreProcedure("GetInvoices")
