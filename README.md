@@ -336,6 +336,10 @@ All available end methods can be executed asynchronously. If there's an `Execute
 
 Contributions are welcome! Submit a [pull request](https://github.com/guidospadavecchia/FluentSQL/pulls).
 
+### Mantainers
+- [@guidospadavecchia](https://github.com/guidospadavecchia)
+- [@taraborrellib](https://github.com/taraborrellib)
+
 ## License
 This proyect is distributed under the [MIT License](https://github.com/guidospadavecchia/FluentSQL/blob/main/LICENSE).
 
