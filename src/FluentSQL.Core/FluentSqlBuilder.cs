@@ -306,26 +306,14 @@ namespace FluentSQL.Core
         /// <param name="joinType">The type of join to apply.</param>
         public IFluentSqlSelectJoinStatement Join(string table, JoinTypes joinType)
         {
-            string joinTypeName;
-            switch (joinType)
+            string joinTypeName = joinType switch
             {
-                case JoinTypes.Inner:
-                    joinTypeName = "INNER";
-                    break;
-                case JoinTypes.Left:
-                    joinTypeName = "LEFT";
-                    break;
-                case JoinTypes.Right:
-                    joinTypeName = "RIGHT";
-                    break;
-                case JoinTypes.FullOuter:
-                    joinTypeName = "FULL OUTER";
-                    break;
-                default:
-                    joinTypeName = "INNER";
-                    break;
-            }
-
+                JoinTypes.Inner => "INNER",
+                JoinTypes.Left => "LEFT",
+                JoinTypes.Right => "RIGHT",
+                JoinTypes.FullOuter => "FULL OUTER",
+                _ => "INNER",
+            };
             _query = $"{_query} {joinTypeName} JOIN {table}";
             return this;
         }
@@ -338,26 +326,14 @@ namespace FluentSQL.Core
         /// <param name="joinType">The type of join to apply.</param>
         public IFluentSqlSelectJoinStatement Join(string table, string tableAlias, JoinTypes joinType)
         {
-            string joinTypeName;
-            switch (joinType)
+            string joinTypeName = joinType switch
             {
-                case JoinTypes.Inner:
-                    joinTypeName = "INNER";
-                    break;
-                case JoinTypes.Left:
-                    joinTypeName = "LEFT";
-                    break;
-                case JoinTypes.Right:
-                    joinTypeName = "RIGHT";
-                    break;
-                case JoinTypes.FullOuter:
-                    joinTypeName = "FULL OUTER";
-                    break;
-                default:
-                    joinTypeName = "INNER";
-                    break;
-            }
-
+                JoinTypes.Inner => "INNER",
+                JoinTypes.Left => "LEFT",
+                JoinTypes.Right => "RIGHT",
+                JoinTypes.FullOuter => "FULL OUTER",
+                _ => "INNER",
+            };
             _query = $"{_query} {joinTypeName} JOIN {table} {tableAlias}";
             return this;
         }
