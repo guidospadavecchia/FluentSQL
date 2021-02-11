@@ -24,10 +24,10 @@ This method will create, open and close an `IDbConnection` for each query execut
 _Note: It is recommended to always wrap the `IFluentSql` object instantiation inside a `using` statement._
 ***
 
-## Transactions
+### Transactions
 To use a transaction, call `BeginTransaction()` and end it by calling `CommitTransaction()`:
 ```csharp
-using (IFluentSql fsql = FluentSqlBuilder.Connect(transaction))
+using (IFluentSql fsql = FluentSqlBuilder.Connect(CONNECTION_STRING))
 {
     fsql.BeginTransaction();
 
@@ -36,6 +36,7 @@ using (IFluentSql fsql = FluentSqlBuilder.Connect(transaction))
     fsql.CommitTransaction();
 }
 ```
+***
 
 ### Select
 
