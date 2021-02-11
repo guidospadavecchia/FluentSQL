@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace FluentSQL.Core
 {
-    public interface IFluentSqlQuery : IDisposable
+    public interface IFluentSql : IDisposable
     {
         int? CommandTimeout { get; }
 
-        IFluentSqlQuery SetTimeout(int seconds);
+        IFluentSql SetTimeout(int seconds);
 
         IFluentSqlSelectStatement Select(params string[] columns);
         IFluentSqlSelectStatement SelectAll();

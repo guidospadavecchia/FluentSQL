@@ -12,7 +12,7 @@ namespace FluentSQL.Core
     /// <summary>
     /// Fluent API for SQL queries.
     /// </summary>
-    public sealed class FluentSqlBuilder : IFluentSqlQuery, IFluentSqlSelectStatement, IFluentSqlSelectDistinctStatement, IFluentSqlSelectTopStatement, IFluentSqlSelectFromStatement, IFluentSqlSelectFromWithNoLockStatement, IFluentSqlSelectWhereStatement, IFluentSqlSelectOrderByStatement, IFluentSqlSelectOrderByAscendingDescendingStatement, IFluentSqlSelectGroupByStatement, IFluentSqlSelectGroupByHavingStatement, IFluentSqlSelectJoinStatement, IFluentSqlSelectJoinOnStatement, IFluentSqlSelectJoinOnWithNoLockStatement, IFluentSqlInsertStatement, IFluentSqlInsertColumnsStatement, IFluentSqlInsertValuesStatement, IFluentSqlUpdateStatement, IFluentSqlUpdateSetStatement, IFluentSqlNonQueryWhereStatement, IFluentSqlDeleteStatement, IFluentSqlExecuteStoredProcedureStatement, IFluentSqlExecuteStoredProcedureParameterStatement, IFluentSqlExecuteStoredProcedureOutputParameterStatement
+    public sealed class FluentSqlBuilder : IFluentSql, IFluentSqlSelectStatement, IFluentSqlSelectDistinctStatement, IFluentSqlSelectTopStatement, IFluentSqlSelectFromStatement, IFluentSqlSelectFromWithNoLockStatement, IFluentSqlSelectWhereStatement, IFluentSqlSelectOrderByStatement, IFluentSqlSelectOrderByAscendingDescendingStatement, IFluentSqlSelectGroupByStatement, IFluentSqlSelectGroupByHavingStatement, IFluentSqlSelectJoinStatement, IFluentSqlSelectJoinOnStatement, IFluentSqlSelectJoinOnWithNoLockStatement, IFluentSqlInsertStatement, IFluentSqlInsertColumnsStatement, IFluentSqlInsertValuesStatement, IFluentSqlUpdateStatement, IFluentSqlUpdateSetStatement, IFluentSqlNonQueryWhereStatement, IFluentSqlDeleteStatement, IFluentSqlExecuteStoredProcedureStatement, IFluentSqlExecuteStoredProcedureParameterStatement, IFluentSqlExecuteStoredProcedureOutputParameterStatement
     {
         #region Vars
 
@@ -85,18 +85,18 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
-        /// Configures the connection to the database and returns a <see cref="IFluentSqlQuery"/> object.
+        /// Configures the connection to the database and returns a <see cref="IFluentSql"/> object.
         /// </summary>
         /// <param name="connectionString">Cadena de conexión al servidor de base de datos.</param>
-        /// <returns>Un objeto <see cref="IFluentSqlQuery"/> instanciado.</returns>
-        public static IFluentSqlQuery Connect(string connectionString) => new FluentSqlBuilder(connectionString);
+        /// <returns>Un objeto <see cref="IFluentSql"/> instanciado.</returns>
+        public static IFluentSql Connect(string connectionString) => new FluentSqlBuilder(connectionString);
 
         /// <summary>
-        /// Configures the connection to the database and returns a <see cref="IFluentSqlQuery"/> object.
+        /// Configures the connection to the database and returns a <see cref="IFluentSql"/> object.
         /// </summary>
         /// <param name="connection">Instancia de conexión a la base de datos.</param>
-        /// <returns>Un objeto <see cref="IFluentSqlQuery"/> instanciado.</returns>
-        public static IFluentSqlQuery Connect(IDbTransaction transaction) => new FluentSqlBuilder(transaction);
+        /// <returns>Un objeto <see cref="IFluentSql"/> instanciado.</returns>
+        public static IFluentSql Connect(IDbTransaction transaction) => new FluentSqlBuilder(transaction);
 
         #endregion
 
@@ -134,7 +134,7 @@ namespace FluentSQL.Core
         /// Sets the maximum time to wait for a query to run before throwing an error.
         /// </summary>
         /// <param name="seconds">Maximum seconds to allow.</param>
-        public IFluentSqlQuery SetTimeout(int seconds)
+        public IFluentSql SetTimeout(int seconds)
         {
             _commandTimeout = seconds;
             return this;
