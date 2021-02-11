@@ -7,6 +7,7 @@ namespace FluentSQL.Core
     public interface IFluentSql : IDisposable
     {
         int? CommandTimeout { get; }
+        bool InTransaction { get; }
 
         IFluentSql SetTimeout(int seconds);
 
@@ -30,5 +31,8 @@ namespace FluentSQL.Core
         Task<IEnumerable<T>> ExecuteCustomQueryAsync<T>(string sqlQuery, object parameters);
         Task<int> ExecuteCustomNonQueryAsync(string sqlQuery);
         Task<int> ExecuteCustomNonQueryAsync(string sqlQuery, object parameters);
+
+        void BeginTransaction();
+        void CommitTransaction();
     }
 }

@@ -21,7 +21,9 @@ namespace FluentSQL.Core
         private int? _commandTimeout = null;
         private string _query = null;
         private string _spName = null;
+        private IDbConnection _connection = null;
         private IDbTransaction _transaction = null;
+        private bool _inTransaction;
         private Dictionary<string, object> _spParameters = new Dictionary<string, object>();
         private List<OutputParameter> _spOutputParameters = new List<OutputParameter>();
 
@@ -62,6 +64,17 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <summary>
+        /// Indicates whether a transaction is currently active.
+        /// </summary>
+        public bool InTransaction
+        {
+            get
+            {
+                return _inTransaction;
+            }
+        }
+
         #endregion
 
         #region Constructors
@@ -76,27 +89,11 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
-        /// Creates a new <see cref="FluentSqlBuilder"/> using an existing <see cref="IDbTransaction"/>.
-        /// </summary>
-        /// <param name="transaction">Transaction instance to be used.</param>
-        private FluentSqlBuilder(IDbTransaction transaction)
-        {
-            _transaction = transaction;
-        }
-
-        /// <summary>
         /// Configures the connection to the database and returns a <see cref="IFluentSql"/> object.
         /// </summary>
         /// <param name="connectionString">Cadena de conexión al servidor de base de datos.</param>
         /// <returns>Un objeto <see cref="IFluentSql"/> instanciado.</returns>
         public static IFluentSql Connect(string connectionString) => new FluentSqlBuilder(connectionString);
-
-        /// <summary>
-        /// Configures the connection to the database and returns a <see cref="IFluentSql"/> object.
-        /// </summary>
-        /// <param name="connection">Instancia de conexión a la base de datos.</param>
-        /// <returns>Un objeto <see cref="IFluentSql"/> instanciado.</returns>
-        public static IFluentSql Connect(IDbTransaction transaction) => new FluentSqlBuilder(transaction);
 
         #endregion
 
@@ -108,7 +105,36 @@ namespace FluentSQL.Core
             {
                 if (disposing)
                 {
-                    _transaction = null;
+                    if (_transaction != null)
+                    {
+                        try
+                        {
+                            _transaction.Rollback();
+                        }
+                        finally
+                        {
+                            _transaction.Dispose();
+                            _transaction = null;
+                        }
+                    }
+
+                    if (_connection != null)
+                    {
+                        try
+                        {
+                            if (_connection.State == ConnectionState.Open)
+                            {
+                                _connection.Close();
+                            }
+                        }
+                        finally
+                        {
+                            _connection.Dispose();
+                            _connection = null;
+                        }
+                    }
+
+                    _inTransaction = false;
                     _spParameters = null;
                     _spOutputParameters = null;
                 }
@@ -138,6 +164,65 @@ namespace FluentSQL.Core
         {
             _commandTimeout = seconds;
             return this;
+        }
+
+        #endregion
+
+        #region Transactions
+
+        /// <summary>
+        /// Starts a new transaction. Changes must be committed by calling CommitTransaction().
+        /// </summary>
+        public void BeginTransaction()
+        {
+            if (_connection == null)
+            {
+                _connection = new SqlConnection(_connectionString);
+            }
+
+            if (_connection.State == ConnectionState.Closed)
+            {
+                _connection.Open();
+            }
+
+            if (_transaction == null)
+            {
+                _transaction = _connection.BeginTransaction();
+            }
+
+            _inTransaction = true;
+        }
+
+        /// <summary>
+        /// Commits the changes from the current transaction.
+        /// </summary>
+        public void CommitTransaction()
+        {
+            try
+            {
+                if (_transaction != null)
+                {
+                    _transaction.Commit();
+                }
+            }
+            catch (Exception)
+            {
+                if (_transaction != null)
+                {
+                    _transaction.Rollback();
+                }
+                throw;
+            }
+            finally
+            {
+                _inTransaction = false;
+
+                if (_transaction != null)
+                {
+                    _transaction.Dispose();
+                    _transaction = null;
+                }
+            }
         }
 
         #endregion
