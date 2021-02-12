@@ -584,6 +584,10 @@ namespace FluentSQL.Core
                 {
                     insertValues += $"'{valueDateTime:yyyy-MM-dd hh:mm:ss.fff}', ";
                 }
+                else if (value is bool valueBoolean)
+                {
+                    insertValues += $"{(valueBoolean ? "1" : "0")}, ";
+                }
                 else
                 {
                     insertValues += $"{value}, ";
@@ -629,6 +633,10 @@ namespace FluentSQL.Core
                 else if (assignment.Value is DateTime valueDateTime)
                 {
                     values += $" {assignment.Key} = '{valueDateTime:yyyy-MM-dd hh:mm:ss.fff}', ";
+                }
+                else if (assignment.Value is bool valueBoolean)
+                {
+                    values += $"{(valueBoolean ? "1" : "0")}, ";
                 }
                 else
                 {
