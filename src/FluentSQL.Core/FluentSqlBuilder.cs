@@ -222,6 +222,12 @@ namespace FluentSQL.Core
                     _transaction.Dispose();
                     _transaction = null;
                 }
+
+                if (_connection != null)
+                {
+                    _connection.Dispose();
+                    _connection = null;
+                }
             }
         }
 
@@ -525,7 +531,7 @@ namespace FluentSQL.Core
                     connection.Dispose();
                 }
             }
-        } 
+        }
 
         #endregion
 
@@ -737,8 +743,8 @@ namespace FluentSQL.Core
                     connection.Dispose();
                 }
             }
-        } 
-        
+        }
+
         #endregion
 
         #endregion
@@ -1676,8 +1682,8 @@ namespace FluentSQL.Core
                     connection.Dispose();
                 }
             }
-        }         
-        
+        }
+
         #endregion
 
         #endregion
