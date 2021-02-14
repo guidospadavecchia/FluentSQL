@@ -19,6 +19,7 @@ namespace FluentSQL.Core
         private bool _disposed;
         private readonly string _connectionString = null;
         private int? _timeout = null;
+        private static int? _globalTimeout = null;
         private string _query = null;
         private string _spName = null;
         private IDbConnection _connection = null;
@@ -32,13 +33,13 @@ namespace FluentSQL.Core
         #region Properties
 
         /// <summary>
-        /// Maximum allowed time for a query to finish executing. Must be configured using <see cref="SetTimeout(int)"/>.         
+        /// Maximum allowed time for a query to finish executing.         
         /// </summary>
         public int? Timeout
         {
             get
             {
-                return _timeout;
+                return _timeout ?? _globalTimeout;
             }
         }
 
@@ -83,10 +84,7 @@ namespace FluentSQL.Core
         /// Creates a new <see cref="FluentSqlBuilder"/>.
         /// </summary>
         /// <param name="connectionString">Connection string.</param>
-        private FluentSqlBuilder(string connectionString)
-        {
-            _connectionString = connectionString;
-        }
+        private FluentSqlBuilder(string connectionString) => _connectionString = connectionString;
 
         /// <summary>
         /// Configures the connection to the database and returns a <see cref="IFluentSql"/> object.
@@ -155,6 +153,14 @@ namespace FluentSQL.Core
         #region Methods
 
         #region Initial Configuration
+
+        /// <summary>
+        /// Sets the maximum time to wait for a query to run before throwing an error. 
+        /// This applies globally to all instances of <see cref="IFluentSql"/>. 
+        /// To set a different timeout for each query, use <see cref="IFluentSql.SetTimeout(int)"/>.
+        /// </summary>
+        /// <param name="seconds"></param>
+        public static void SetGlobalTimeout(int seconds) => _globalTimeout = seconds;
 
         /// <summary>
         /// Sets the maximum time to wait for a query to run before throwing an error.
@@ -471,7 +477,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return connection.Query(_query, transaction: _transaction, commandTimeout: _timeout);
+                return connection.Query(_query, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -497,7 +503,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return connection.Query<T>(_query, transaction: _transaction, commandTimeout: _timeout);
+                return connection.Query<T>(_query, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -526,7 +532,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return await connection.QueryAsync(_query, transaction: _transaction, commandTimeout: _timeout);
+                return await connection.QueryAsync(_query, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -552,7 +558,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return await connection.QueryAsync<T>(_query, transaction: _transaction, commandTimeout: _timeout);
+                return await connection.QueryAsync<T>(_query, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -743,7 +749,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return connection.Execute(_query, transaction: _transaction, commandTimeout: _timeout);
+                return connection.Execute(_query, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -772,7 +778,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return await connection.ExecuteAsync(_query, transaction: _transaction, commandTimeout: _timeout);
+                return await connection.ExecuteAsync(_query, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -922,7 +928,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return connection.Execute(_spName, parameters, _transaction, _timeout, CommandType.StoredProcedure);
+                return connection.Execute(_spName, parameters, _transaction, Timeout, CommandType.StoredProcedure);
             }
             finally
             {
@@ -954,7 +960,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return connection.Query(_spName, parameters, _transaction, commandTimeout: _timeout, commandType: CommandType.StoredProcedure);
+                return connection.Query(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
             }
             finally
             {
@@ -987,7 +993,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return connection.Query<T>(_spName, parameters, _transaction, commandTimeout: _timeout, commandType: CommandType.StoredProcedure);
+                return connection.Query<T>(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
             }
             finally
             {
@@ -1026,7 +1032,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                int affectedRows = connection.Execute(_spName, parameters, _transaction, _timeout, CommandType.StoredProcedure);
+                int affectedRows = connection.Execute(_spName, parameters, _transaction, Timeout, CommandType.StoredProcedure);
 
                 foreach (OutputParameter outputParameter in _spOutputParameters)
                 {
@@ -1075,7 +1081,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                IEnumerable<dynamic> result = connection.Query(_spName, parameters, _transaction, commandTimeout: _timeout, commandType: CommandType.StoredProcedure);
+                IEnumerable<dynamic> result = connection.Query(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
 
                 foreach (OutputParameter outputParameter in _spOutputParameters)
                 {
@@ -1125,7 +1131,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                IEnumerable<T> result = connection.Query<T>(_spName, parameters, _transaction, commandTimeout: _timeout, commandType: CommandType.StoredProcedure);
+                IEnumerable<T> result = connection.Query<T>(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
 
                 foreach (OutputParameter outputParameter in _spOutputParameters)
                 {
@@ -1172,7 +1178,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return await connection.ExecuteAsync(_spName, parameters, _transaction, _timeout, CommandType.StoredProcedure);
+                return await connection.ExecuteAsync(_spName, parameters, _transaction, Timeout, CommandType.StoredProcedure);
             }
             finally
             {
@@ -1204,7 +1210,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return await connection.QueryAsync(_spName, parameters, _transaction, commandTimeout: _timeout, commandType: CommandType.StoredProcedure);
+                return await connection.QueryAsync(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
             }
             finally
             {
@@ -1238,7 +1244,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return await connection.QueryAsync<T>(_spName, parameters, _transaction, commandTimeout: _timeout, commandType: CommandType.StoredProcedure);
+                return await connection.QueryAsync<T>(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
             }
             finally
             {
@@ -1277,7 +1283,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                int affectedRows = await connection.ExecuteAsync(_spName, parameters, _transaction, _timeout, CommandType.StoredProcedure);
+                int affectedRows = await connection.ExecuteAsync(_spName, parameters, _transaction, Timeout, CommandType.StoredProcedure);
 
                 foreach (OutputParameter outputParameter in _spOutputParameters)
                 {
@@ -1326,7 +1332,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                IEnumerable<dynamic> result = await connection.QueryAsync(_spName, parameters, _transaction, commandTimeout: _timeout, commandType: CommandType.StoredProcedure);
+                IEnumerable<dynamic> result = await connection.QueryAsync(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
 
                 foreach (OutputParameter outputParameter in _spOutputParameters)
                 {
@@ -1376,7 +1382,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                IEnumerable<T> result = await connection.QueryAsync<T>(_spName, parameters, _transaction, commandTimeout: _timeout, commandType: CommandType.StoredProcedure);
+                IEnumerable<T> result = await connection.QueryAsync<T>(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
 
                 foreach (OutputParameter outputParameter in _spOutputParameters)
                 {
@@ -1422,7 +1428,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                return connection.Execute(sqlQuery, transaction: _transaction, commandTimeout: _timeout);
+                return connection.Execute(sqlQuery, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -1448,7 +1454,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                return connection.Execute(sqlQuery, parameters, _transaction, _timeout);
+                return connection.Execute(sqlQuery, parameters, _transaction, Timeout);
             }
             finally
             {
@@ -1473,7 +1479,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                return connection.Query(sqlQuery, transaction: _transaction, commandTimeout: _timeout);
+                return connection.Query(sqlQuery, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -1499,7 +1505,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                return connection.Query(sqlQuery, parameters, _transaction, commandTimeout: _timeout);
+                return connection.Query(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -1525,7 +1531,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                return connection.Query<T>(sqlQuery, transaction: _transaction, commandTimeout: _timeout);
+                return connection.Query<T>(sqlQuery, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -1552,7 +1558,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                return connection.Query<T>(sqlQuery, parameters, _transaction, commandTimeout: _timeout);
+                return connection.Query<T>(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -1581,7 +1587,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                return await connection.ExecuteAsync(sqlQuery, transaction: _transaction, commandTimeout: _timeout);
+                return await connection.ExecuteAsync(sqlQuery, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -1607,7 +1613,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                return await connection.ExecuteAsync(sqlQuery, parameters, _transaction, _timeout);
+                return await connection.ExecuteAsync(sqlQuery, parameters, _transaction, Timeout);
             }
             finally
             {
@@ -1632,7 +1638,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                return await connection.QueryAsync(sqlQuery, transaction: _transaction, commandTimeout: _timeout);
+                return await connection.QueryAsync(sqlQuery, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -1658,7 +1664,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                return await connection.QueryAsync(sqlQuery, parameters, _transaction, commandTimeout: _timeout);
+                return await connection.QueryAsync(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -1684,7 +1690,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                return await connection.QueryAsync<T>(sqlQuery, transaction: _transaction, commandTimeout: _timeout);
+                return await connection.QueryAsync<T>(sqlQuery, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -1711,7 +1717,7 @@ namespace FluentSQL.Core
                 {
                     connection.Open();
                 }
-                return await connection.QueryAsync<T>(sqlQuery, parameters, _transaction, commandTimeout: _timeout);
+                return await connection.QueryAsync<T>(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
             }
             finally
             {
