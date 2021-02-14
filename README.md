@@ -36,6 +36,35 @@ using (IFluentSql fsql = FluentSqlBuilder.Connect(CONNECTION_STRING))
     fsql.CommitTransaction();
 }
 ```
+
+### Configuration
+
+#### Query Timeout
+You can set amount of seconds a query can last before timing out, by calling `SetTimeout()` after `FluentSqlBuilder.Connect()`:
+
+```csharp
+using (IFluentSql fsql = FluentSqlBuilder.Connect(CONNECTION_STRING).SetTimeout(30))
+{
+    ...
+}
+```
+or...
+```csharp
+using (IFluentSql fsql = FluentSqlBuilder.Connect(CONNECTION_STRING))
+{
+    fsql.SetTimeout(30);
+    ...
+}
+```
+
+Alternatively, you can set a global timeout using the static `FluentSqlBuilder.SetGlobalTimeout()`:
+
+```csharp
+FluentSqlBuilder.SetGlobalTimeout(30);
+```
+
+**Order of priority**: First, the query timeout will be used, if not set, the global timeout will be used, and if not set, the default SQL timeout will be used.
+
 ***
 
 ### Select
