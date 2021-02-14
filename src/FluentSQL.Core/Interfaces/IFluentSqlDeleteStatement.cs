@@ -5,7 +5,7 @@ namespace FluentSQL.Core
     public interface IFluentSqlDeleteStatement
     {
         string Query { get; }
-        int? CommandTimeout { get; }
+        int? Timeout { get; }
 
         IFluentSqlNonQueryWhereStatement Where(string condition);
 

@@ -6,7 +6,7 @@ namespace FluentSQL.Core
     public interface IFluentSqlSelectOrderByStatement
     {
         string Query { get; }
-        int? CommandTimeout { get; }
+        int? Timeout { get; }
 
         IFluentSqlSelectOrderByAscendingDescendingStatement Ascending();
         IFluentSqlSelectOrderByAscendingDescendingStatement Descending();

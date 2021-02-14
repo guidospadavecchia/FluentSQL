@@ -6,7 +6,7 @@ namespace FluentSQL.Core
 {
     public interface IFluentSql : IDisposable
     {
-        int? CommandTimeout { get; }
+        int? Timeout { get; }
         bool InTransaction { get; }
 
         IFluentSql SetTimeout(int seconds);
@@ -34,5 +34,6 @@ namespace FluentSQL.Core
 
         void BeginTransaction();
         void CommitTransaction();
+        void RollbackTransaction();
     }
 }

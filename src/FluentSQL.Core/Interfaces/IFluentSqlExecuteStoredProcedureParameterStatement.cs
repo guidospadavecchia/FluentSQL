@@ -7,7 +7,7 @@ namespace FluentSQL.Core
     public interface IFluentSqlExecuteStoredProcedureParameterStatement
     {
         string Name { get; }
-        int? CommandTimeout { get; }
+        int? Timeout { get; }
 
         IFluentSqlExecuteStoredProcedureParameterStatement WithParameters(Dictionary<string, object> parameters);
         IFluentSqlExecuteStoredProcedureParameterStatement WithParameter(string name, object value);

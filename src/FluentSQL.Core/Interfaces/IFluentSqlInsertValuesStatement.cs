@@ -5,7 +5,7 @@ namespace FluentSQL.Core
     public interface IFluentSqlInsertValuesStatement
     {
         string Query { get; }
-        int? CommandTimeout { get; }
+        int? Timeout { get; }
 
         int Execute();
         Task<int> ExecuteAsync();

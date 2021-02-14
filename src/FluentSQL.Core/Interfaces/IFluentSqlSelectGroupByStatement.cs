@@ -6,7 +6,7 @@ namespace FluentSQL.Core
     public interface IFluentSqlSelectGroupByStatement
     {
         string Query { get; }
-        int? CommandTimeout { get; }
+        int? Timeout { get; }
 
         IFluentSqlSelectGroupByHavingStatement Having(string condition);
         IFluentSqlSelectOrderByStatement OrderBy(params string[] columns);

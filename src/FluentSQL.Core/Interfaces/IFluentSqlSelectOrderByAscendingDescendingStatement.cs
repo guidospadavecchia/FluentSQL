@@ -6,7 +6,7 @@ namespace FluentSQL.Core
     public interface IFluentSqlSelectOrderByAscendingDescendingStatement
     {
         string Query { get; }
-        int? CommandTimeout { get; }
+        int? Timeout { get; }
 
         IEnumerable<dynamic> ToDynamic();
         IEnumerable<T> ToMappedObject<T>();

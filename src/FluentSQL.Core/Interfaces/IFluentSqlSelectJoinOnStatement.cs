@@ -6,7 +6,7 @@ namespace FluentSQL.Core
     public interface IFluentSqlSelectJoinOnStatement
     {
         string Query { get; }
-        int? CommandTimeout { get; }
+        int? Timeout { get; }
 
         IFluentSqlSelectJoinOnWithNoLockStatement WithNoLock();
         IFluentSqlSelectWhereStatement Where(string condition);

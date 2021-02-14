@@ -6,7 +6,7 @@ namespace FluentSQL.Core
     public interface IFluentSqlSelectFromWithNoLockStatement
     {
         string Query { get; }
-        int? CommandTimeout { get; }
+        int? Timeout { get; }
 
         IFluentSqlSelectJoinStatement Join(string table, JoinTypes joinType);
         IFluentSqlSelectJoinStatement Join(string table, string tableAlias, JoinTypes joinType);

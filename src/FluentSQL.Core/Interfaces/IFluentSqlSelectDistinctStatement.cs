@@ -6,7 +6,7 @@ namespace FluentSQL.Core
     public interface IFluentSqlSelectDistinctStatement
     {
         string Query { get; }
-        int? CommandTimeout { get; }
+        int? Timeout { get; }
 
         IFluentSqlSelectTopStatement Top(int rows);
         IFluentSqlSelectFromStatement From(string table);
