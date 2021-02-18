@@ -1015,13 +1015,7 @@ namespace FluentSQL.Core
         /// <returns>Affected rows.</returns>
         public int ExecuteNonQuery()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
             try
             {
@@ -1047,13 +1041,7 @@ namespace FluentSQL.Core
         /// <returns>A collection of dynamic objects.</returns>
         public IEnumerable<dynamic> ExecuteToDynamic()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
             try
             {
@@ -1079,13 +1067,7 @@ namespace FluentSQL.Core
         /// <returns>A single dynamic object or default.</returns>
         public dynamic ExecuteToDynamicSingle()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
             try
             {
@@ -1112,13 +1094,7 @@ namespace FluentSQL.Core
         /// <returns>A collection of <typeparamref name="T"/> typed objects, representing a row each.</returns>
         public IEnumerable<T> ExecuteToMappedObject<T>()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
             try
             {
@@ -1145,13 +1121,7 @@ namespace FluentSQL.Core
         /// <returns>A single <typeparamref name="T"/> typed object, or default.</returns>
         public T ExecuteToMappedObjectSingle<T>()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
             try
             {
@@ -1177,21 +1147,8 @@ namespace FluentSQL.Core
         /// <returns>An object containing the affected rows and a collection of key-value pairs with the output parameters.</returns>
         StoredProcedureWithOutputResult<int> IFluentSqlStoredProcedureWithOutputEnd.ExecuteNonQuery()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-            foreach (OutputParameter outputParameter in _spOutputParameters)
-            {
-                string outputParameterName = outputParameter.Name.StartsWith("@") ? outputParameter.Name : $"@{outputParameter.Name}";
-                parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
-            }
-
-            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
-            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
-
+            var parameters = CreateDynamicParameters();
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);            
             try
             {
                 if (connection.State == ConnectionState.Closed)
@@ -1200,17 +1157,7 @@ namespace FluentSQL.Core
                 }
 
                 int affectedRows = connection.Execute(_spName, parameters, _transaction, Timeout, CommandType.StoredProcedure);
-
-                foreach (OutputParameter outputParameter in _spOutputParameters)
-                {
-                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
-                    {
-                        object value = parameters.Get<object>(outputParameter.Name);
-                        outputParameters.Add(outputParameter.Name, value);
-                    }
-                }
-
-                return new StoredProcedureWithOutputResult<int>(affectedRows, outputParameters);
+                return new StoredProcedureWithOutputResult<int>(affectedRows, GetOutputParameters(parameters));
             }
             finally
             {
@@ -1227,21 +1174,8 @@ namespace FluentSQL.Core
         /// <returns>An object containing a collection of dynamic objects and a collection of key-value pairs with the output parameters.</returns>
         StoredProcedureWithOutputResult<IEnumerable<dynamic>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToDynamic()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-            foreach (OutputParameter outputParameter in _spOutputParameters)
-            {
-                string outputParameterName = outputParameter.Name.StartsWith("@") ? outputParameter.Name : $"@{outputParameter.Name}";
-                parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
-            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
-
             try
             {
                 if (connection.State == ConnectionState.Closed)
@@ -1249,17 +1183,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
                 IEnumerable<dynamic> result = connection.Query(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
-
-                foreach (OutputParameter outputParameter in _spOutputParameters)
-                {
-                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
-                    {
-                        object value = parameters.Get<object>(outputParameter.Name);
-                        outputParameters.Add(outputParameter.Name, value);
-                    }
-                }
-
-                return new StoredProcedureWithOutputResult<IEnumerable<dynamic>>(result, outputParameters);
+                return new StoredProcedureWithOutputResult<IEnumerable<dynamic>>(result, GetOutputParameters(parameters));
             }
             finally
             {
@@ -1276,21 +1200,8 @@ namespace FluentSQL.Core
         /// <returns>An object containing a single dynamic object and a collection of key-value pairs with the output parameters.</returns>
         StoredProcedureWithOutputResult<dynamic> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToDynamicSingle()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-            foreach (OutputParameter outputParameter in _spOutputParameters)
-            {
-                string outputParameterName = outputParameter.Name.StartsWith("@") ? outputParameter.Name : $"@{outputParameter.Name}";
-                parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
-            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
-
             try
             {
                 if (connection.State == ConnectionState.Closed)
@@ -1298,17 +1209,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
                 var result = connection.QueryFirstOrDefault(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
-
-                foreach (OutputParameter outputParameter in _spOutputParameters)
-                {
-                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
-                    {
-                        object value = parameters.Get<object>(outputParameter.Name);
-                        outputParameters.Add(outputParameter.Name, value);
-                    }
-                }
-
-                return new StoredProcedureWithOutputResult<dynamic>(result, outputParameters);
+                return new StoredProcedureWithOutputResult<dynamic>(result, GetOutputParameters(parameters));
             }
             finally
             {
@@ -1326,21 +1227,8 @@ namespace FluentSQL.Core
         /// <returns>An object containing a collection of <typeparamref name="T"/> typed objects representing a row each, and a collection of key-value pairs with the output parameters.</returns>
         StoredProcedureWithOutputResult<IEnumerable<T>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToMappedObject<T>()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-            foreach (OutputParameter outputParameter in _spOutputParameters)
-            {
-                string outputParameterName = outputParameter.Name.StartsWith("@") ? outputParameter.Name : $"@{outputParameter.Name}";
-                parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
-            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
-
             try
             {
                 if (connection.State == ConnectionState.Closed)
@@ -1348,17 +1236,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
                 IEnumerable<T> result = connection.Query<T>(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
-
-                foreach (OutputParameter outputParameter in _spOutputParameters)
-                {
-                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
-                    {
-                        object value = parameters.Get<object>(outputParameter.Name);
-                        outputParameters.Add(outputParameter.Name, value);
-                    }
-                }
-
-                return new StoredProcedureWithOutputResult<IEnumerable<T>>(result, outputParameters);
+                return new StoredProcedureWithOutputResult<IEnumerable<T>>(result, GetOutputParameters(parameters));
             }
             finally
             {
@@ -1376,21 +1254,8 @@ namespace FluentSQL.Core
         /// <returns>An object containing a single <typeparamref name="T"/> typed object, and a collection of key-value pairs with the output parameters.</returns>
         StoredProcedureWithOutputResult<T> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToMappedObjectSingle<T>()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-            foreach (OutputParameter outputParameter in _spOutputParameters)
-            {
-                string outputParameterName = outputParameter.Name.StartsWith("@") ? outputParameter.Name : $"@{outputParameter.Name}";
-                parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
-            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
-
             try
             {
                 if (connection.State == ConnectionState.Closed)
@@ -1398,17 +1263,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
                 var result = connection.QueryFirstOrDefault<T>(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
-
-                foreach (OutputParameter outputParameter in _spOutputParameters)
-                {
-                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
-                    {
-                        object value = parameters.Get<object>(outputParameter.Name);
-                        outputParameters.Add(outputParameter.Name, value);
-                    }
-                }
-
-                return new StoredProcedureWithOutputResult<T>(result, outputParameters);
+                return new StoredProcedureWithOutputResult<T>(result, GetOutputParameters(parameters));
             }
             finally
             {
@@ -1429,13 +1284,7 @@ namespace FluentSQL.Core
         /// <returns>A task with the affected rows.</returns>
         public async Task<int> ExecuteNonQueryAsync()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
             try
             {
@@ -1461,13 +1310,7 @@ namespace FluentSQL.Core
         /// <returns>A task with a collection of dynamic objects.</returns>
         public async Task<IEnumerable<dynamic>> ExecuteToDynamicAsync()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
             try
             {
@@ -1493,13 +1336,7 @@ namespace FluentSQL.Core
         /// <returns>A task with a single dynamic object, or default.</returns>
         public async Task<dynamic> ExecuteToDynamicSingleAsync()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
             try
             {
@@ -1526,13 +1363,7 @@ namespace FluentSQL.Core
         /// <returns>A task with a collection of <typeparamref name="T"/> typed objects, representing a row each.</returns>
         public async Task<IEnumerable<T>> ExecuteToMappedObjectAsync<T>()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
             try
             {
@@ -1559,13 +1390,7 @@ namespace FluentSQL.Core
         /// <returns>A task with a single <typeparamref name="T"/> typed object, or default.</returns>
         public async Task<T> ExecuteToMappedObjectSingleAsync<T>()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
             try
             {
@@ -1591,21 +1416,8 @@ namespace FluentSQL.Core
         /// <returns>A task with an object containing the affected rows and a collection of key-value pairs with the output parameters.</returns>
         async Task<StoredProcedureWithOutputResult<int>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteNonQueryAsync()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-            foreach (OutputParameter outputParameter in _spOutputParameters)
-            {
-                string outputParameterName = outputParameter.Name.StartsWith("@") ? outputParameter.Name : $"@{outputParameter.Name}";
-                parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
-            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
-
             try
             {
                 if (connection.State == ConnectionState.Closed)
@@ -1614,17 +1426,7 @@ namespace FluentSQL.Core
                 }
 
                 int affectedRows = await connection.ExecuteAsync(_spName, parameters, _transaction, Timeout, CommandType.StoredProcedure);
-
-                foreach (OutputParameter outputParameter in _spOutputParameters)
-                {
-                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
-                    {
-                        object value = parameters.Get<object>(outputParameter.Name);
-                        outputParameters.Add(outputParameter.Name, value);
-                    }
-                }
-
-                return new StoredProcedureWithOutputResult<int>(affectedRows, outputParameters);
+                return new StoredProcedureWithOutputResult<int>(affectedRows, GetOutputParameters(parameters));
             }
             finally
             {
@@ -1641,21 +1443,8 @@ namespace FluentSQL.Core
         /// <returns>A task with an object containing a collection of dynamic objects and a collection of key-value pairs with the output parameters.</returns>
         async Task<StoredProcedureWithOutputResult<IEnumerable<dynamic>>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToDynamicAsync()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-            foreach (OutputParameter outputParameter in _spOutputParameters)
-            {
-                string outputParameterName = outputParameter.Name.StartsWith("@") ? outputParameter.Name : $"@{outputParameter.Name}";
-                parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
-            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
-
             try
             {
                 if (connection.State == ConnectionState.Closed)
@@ -1663,17 +1452,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
                 IEnumerable<dynamic> result = await connection.QueryAsync(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
-
-                foreach (OutputParameter outputParameter in _spOutputParameters)
-                {
-                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
-                    {
-                        object value = parameters.Get<object>(outputParameter.Name);
-                        outputParameters.Add(outputParameter.Name, value);
-                    }
-                }
-
-                return new StoredProcedureWithOutputResult<IEnumerable<dynamic>>(result, outputParameters);
+                return new StoredProcedureWithOutputResult<IEnumerable<dynamic>>(result, GetOutputParameters(parameters));
             }
             finally
             {
@@ -1690,21 +1469,8 @@ namespace FluentSQL.Core
         /// <returns>A task with an object containing a single dynamic object and a collection of key-value pairs with the output parameters.</returns>
         async Task<StoredProcedureWithOutputResult<dynamic>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToDynamicSingleAsync()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-            foreach (OutputParameter outputParameter in _spOutputParameters)
-            {
-                string outputParameterName = outputParameter.Name.StartsWith("@") ? outputParameter.Name : $"@{outputParameter.Name}";
-                parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
-            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
-
             try
             {
                 if (connection.State == ConnectionState.Closed)
@@ -1712,17 +1478,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
                 var result = await connection.QueryFirstOrDefaultAsync(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
-
-                foreach (OutputParameter outputParameter in _spOutputParameters)
-                {
-                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
-                    {
-                        object value = parameters.Get<object>(outputParameter.Name);
-                        outputParameters.Add(outputParameter.Name, value);
-                    }
-                }
-
-                return new StoredProcedureWithOutputResult<dynamic>(result, outputParameters);
+                return new StoredProcedureWithOutputResult<dynamic>(result, GetOutputParameters(parameters));
             }
             finally
             {
@@ -1740,21 +1496,8 @@ namespace FluentSQL.Core
         /// <returns>An object containing a collection of <typeparamref name="T"/> typed objects representing a row each, and a collection of key-value pairs with the output parameters.</returns>
         async Task<StoredProcedureWithOutputResult<IEnumerable<T>>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToMappedObjectAsync<T>()
         {
-            var parameters = new DynamicParameters();
-            foreach (var parameter in _spParameters)
-            {
-                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
-                parameters.Add(nameParameter, parameter.Value);
-            }
-            foreach (OutputParameter outputParameter in _spOutputParameters)
-            {
-                string outputParameterName = outputParameter.Name.StartsWith("@") ? outputParameter.Name : $"@{outputParameter.Name}";
-                parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
-            }
-
+            var parameters = CreateDynamicParameters();
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
-            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
-
             try
             {
                 if (connection.State == ConnectionState.Closed)
@@ -1762,17 +1505,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
                 IEnumerable<T> result = await connection.QueryAsync<T>(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
-
-                foreach (OutputParameter outputParameter in _spOutputParameters)
-                {
-                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
-                    {
-                        object value = parameters.Get<object>(outputParameter.Name);
-                        outputParameters.Add(outputParameter.Name, value);
-                    }
-                }
-
-                return new StoredProcedureWithOutputResult<IEnumerable<T>>(result, outputParameters);
+                return new StoredProcedureWithOutputResult<IEnumerable<T>>(result, GetOutputParameters(parameters));
             }
             finally
             {
@@ -1790,6 +1523,38 @@ namespace FluentSQL.Core
         /// <returns>An object containing a single <typeparamref name="T"/> typed object, and a collection of key-value pairs with the output parameters.</returns>
         async Task<StoredProcedureWithOutputResult<T>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToMappedObjectSingleAsync<T>()
         {
+            var parameters = CreateDynamicParameters();
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                T result = await connection.QueryFirstOrDefaultAsync<T>(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
+                return new StoredProcedureWithOutputResult<T>(result, GetOutputParameters(parameters));
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Private
+
+        /// <summary>
+        /// Creats a <see cref="DynamicParameters"/> collection including all parameters set in query building.
+        /// </summary>
+        /// <returns>A <see cref="DynamicParameters"/> collection.</returns>
+        private DynamicParameters CreateDynamicParameters()
+        {
             var parameters = new DynamicParameters();
             foreach (var parameter in _spParameters)
             {
@@ -1802,38 +1567,28 @@ namespace FluentSQL.Core
                 parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
             }
 
-            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
-            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
-
-            try
-            {
-                if (connection.State == ConnectionState.Closed)
-                {
-                    connection.Open();
-                }
-                T result = await connection.QueryFirstOrDefaultAsync<T>(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
-
-                foreach (OutputParameter outputParameter in _spOutputParameters)
-                {
-                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
-                    {
-                        object value = parameters.Get<object>(outputParameter.Name);
-                        outputParameters.Add(outputParameter.Name, value);
-                    }
-                }
-
-                return new StoredProcedureWithOutputResult<T>(result, outputParameters);
-            }
-            finally
-            {
-                if (_transaction == null)
-                {
-                    connection.Dispose();
-                }
-            }
+            return parameters;
         }
 
-        #endregion
+        /// <summary>
+        /// Returns a collection of key-value pairs containing the output parameters and their values.
+        /// </summary>
+        /// <param name="parameters">The <see cref="DynamicParameters"/> collection.</param>
+        /// <returns>A collection of output parameters.</returns>
+        private Dictionary<string, object> GetOutputParameters(DynamicParameters parameters)
+        {
+            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
+            foreach (OutputParameter outputParameter in _spOutputParameters)
+            {
+                if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
+                {
+                    object value = parameters.Get<object>(outputParameter.Name);
+                    outputParameters.Add(outputParameter.Name, value);
+                }
+            }
+
+            return outputParameters;
+        }
 
         #endregion
 
