@@ -774,7 +774,7 @@ namespace FluentSQL.Core
                 }
                 else if (assignment.Value is bool valueBoolean)
                 {
-                    values += $"{(valueBoolean ? "1" : "0")}, ";
+                    values += $" {assignment.Key} = {(valueBoolean ? "1" : "0")}, ";
                 }
                 else
                 {
