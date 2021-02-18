@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace FluentSQL.Core
 {
-    public interface IFluentSqlSelectDistinctStatement
+    public interface IFluentSqlSelectDistinctStatement : IFluentSqlQueryEnd
     {
         string Query { get; }
         int? Timeout { get; }
@@ -11,11 +11,5 @@ namespace FluentSQL.Core
         IFluentSqlSelectTopStatement Top(int rows);
         IFluentSqlSelectFromStatement From(string table);
         IFluentSqlSelectFromStatement From(string table, string tableAlias);
-
-        IEnumerable<dynamic> ToDynamic();
-        IEnumerable<T> ToMappedObject<T>();
-
-        Task<IEnumerable<dynamic>> ToDynamicAsync();
-        Task<IEnumerable<T>> ToMappedObjectAsync<T>();
     }
 }

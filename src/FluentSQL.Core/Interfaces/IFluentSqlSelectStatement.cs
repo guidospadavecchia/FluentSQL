@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace FluentSQL.Core
+﻿namespace FluentSQL.Core
 {
-    public interface IFluentSqlSelectStatement
+    public interface IFluentSqlSelectStatement : IFluentSqlQueryEnd
     {
         string Query { get; }
         int? Timeout { get; }
@@ -12,11 +9,5 @@ namespace FluentSQL.Core
         IFluentSqlSelectDistinctStatement Distinct();
         IFluentSqlSelectFromStatement From(string table);
         IFluentSqlSelectFromStatement From(string table, string tableAlias);
-
-        IEnumerable<dynamic> ToDynamic();
-        IEnumerable<T> ToMappedObject<T>();
-
-        Task<IEnumerable<dynamic>> ToDynamicAsync();
-        Task<IEnumerable<T>> ToMappedObjectAsync<T>();
     }
 }

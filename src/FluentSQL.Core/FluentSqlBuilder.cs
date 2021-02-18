@@ -489,6 +489,31 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes the query and returns a single dynamic object.
+        /// </summary>
+        /// <returns>Single dynamic object or default.</returns>
+        public dynamic ToDynamicSingle()
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+
+                return connection.QueryFirstOrDefault(_query, transaction: _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes the query and maps the result to a collection of <typeparamref name="T"/> typed objects.
         /// </summary>
         /// <typeparam name="T">Type of the return object.</typeparam>
@@ -504,6 +529,32 @@ namespace FluentSQL.Core
                 }
 
                 return connection.Query<T>(_query, transaction: _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes the query and maps the result to a single <typeparamref name="T"/> typed object.
+        /// </summary>
+        /// <typeparam name="T">Type of the return object.</typeparam>
+        /// <returns>A single <typeparamref name="T"/> typed object or default.</returns>
+        public T ToMappedObjectSingle<T>()
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+
+                return connection.QueryFirstOrDefault<T>(_query, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -544,6 +595,31 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes the query asynchronously and returns a single dynamic object.
+        /// </summary>
+        /// <returns>A task with a single dynamic object, or default.</returns>
+        public async Task<dynamic> ToDynamicSingleAsync()
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+
+                return await connection.QueryFirstOrDefaultAsync(_query, transaction: _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes the query asynchronously and maps the result to a collection of <typeparamref name="T"/> typed objects.
         /// </summary>
         /// <typeparam name="T">Type of the return object.</typeparam>
@@ -559,6 +635,32 @@ namespace FluentSQL.Core
                 }
 
                 return await connection.QueryAsync<T>(_query, transaction: _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes the query asynchronously and maps the result to a single <typeparamref name="T"/> typed object.
+        /// </summary>
+        /// <typeparam name="T">Type of the return object.</typeparam>
+        /// <returns>A task with a single <typeparamref name="T"/> typed object, or default.</returns>
+        public async Task<T> ToMappedObjectSingleAsync<T>()
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+
+                return await connection.QueryFirstOrDefaultAsync<T>(_query, transaction: _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -972,6 +1074,38 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes the Stored Procedure as a query, and returns a single dynamic object.
+        /// </summary>
+        /// <returns>A single dynamic object or default.</returns>
+        public dynamic ExecuteToDynamicSingle()
+        {
+            var parameters = new DynamicParameters();
+            foreach (var parameter in _spParameters)
+            {
+                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
+                parameters.Add(nameParameter, parameter.Value);
+            }
+
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+
+                return connection.QueryFirstOrDefault(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes the Stored Procedure as a query, and returns a collection of <typeparamref name="T"/> typed objects.
         /// </summary>
         /// <typeparam name="T">Type of object to map to.</typeparam>
@@ -1005,10 +1139,43 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes the Stored Procedure as a query, and returns a single <typeparamref name="T"/> typed object.
+        /// </summary>
+        /// <typeparam name="T">Type of object to map to.</typeparam>
+        /// <returns>A single <typeparamref name="T"/> typed object, or default.</returns>
+        public T ExecuteToMappedObjectSingle<T>()
+        {
+            var parameters = new DynamicParameters();
+            foreach (var parameter in _spParameters)
+            {
+                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
+                parameters.Add(nameParameter, parameter.Value);
+            }
+
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+
+                return connection.QueryFirstOrDefault<T>(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes the Stored Procedure as a non-query, returning the affected rows and the output parameters.
         /// </summary>
         /// <returns>An object containing the affected rows and a collection of key-value pairs with the output parameters.</returns>
-        StoredProcedureWithOutputResult<int> IFluentSqlExecuteStoredProcedureOutputParameterStatement.ExecuteNonQuery()
+        StoredProcedureWithOutputResult<int> IFluentSqlStoredProcedureWithOutputEnd.ExecuteNonQuery()
         {
             var parameters = new DynamicParameters();
             foreach (var parameter in _spParameters)
@@ -1058,7 +1225,7 @@ namespace FluentSQL.Core
         /// Executes the Stored Procedure as a query, and returns a collection of dynamic objects and a collection of output parameters.
         /// </summary>
         /// <returns>An object containing a collection of dynamic objects and a collection of key-value pairs with the output parameters.</returns>
-        StoredProcedureWithOutputResult<IEnumerable<dynamic>> IFluentSqlExecuteStoredProcedureOutputParameterStatement.ExecuteToDynamic()
+        StoredProcedureWithOutputResult<IEnumerable<dynamic>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToDynamic()
         {
             var parameters = new DynamicParameters();
             foreach (var parameter in _spParameters)
@@ -1104,11 +1271,60 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes the Stored Procedure as a query, and returns a single dynamic object and a collection of output parameters.
+        /// </summary>
+        /// <returns>An object containing a single dynamic object and a collection of key-value pairs with the output parameters.</returns>
+        StoredProcedureWithOutputResult<dynamic> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToDynamicSingle()
+        {
+            var parameters = new DynamicParameters();
+            foreach (var parameter in _spParameters)
+            {
+                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
+                parameters.Add(nameParameter, parameter.Value);
+            }
+            foreach (OutputParameter outputParameter in _spOutputParameters)
+            {
+                string outputParameterName = outputParameter.Name.StartsWith("@") ? outputParameter.Name : $"@{outputParameter.Name}";
+                parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
+            }
+
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
+
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                var result = connection.QueryFirstOrDefault(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
+
+                foreach (OutputParameter outputParameter in _spOutputParameters)
+                {
+                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
+                    {
+                        object value = parameters.Get<object>(outputParameter.Name);
+                        outputParameters.Add(outputParameter.Name, value);
+                    }
+                }
+
+                return new StoredProcedureWithOutputResult<dynamic>(result, outputParameters);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes the Stored Procedure as a query, and returns a collection of <typeparamref name="T"/> typed objects and a collection of output parameters.
         /// </summary>
         /// <typeparam name="T">Type of object to map to.</typeparam>
         /// <returns>An object containing a collection of <typeparamref name="T"/> typed objects representing a row each, and a collection of key-value pairs with the output parameters.</returns>
-        StoredProcedureWithOutputResult<IEnumerable<T>> IFluentSqlExecuteStoredProcedureOutputParameterStatement.ExecuteToMappedObject<T>()
+        StoredProcedureWithOutputResult<IEnumerable<T>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToMappedObject<T>()
         {
             var parameters = new DynamicParameters();
             foreach (var parameter in _spParameters)
@@ -1143,6 +1359,56 @@ namespace FluentSQL.Core
                 }
 
                 return new StoredProcedureWithOutputResult<IEnumerable<T>>(result, outputParameters);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes the Stored Procedure as a query, and returns a single <typeparamref name="T"/> typed object and a collection of output parameters.
+        /// </summary>
+        /// <typeparam name="T">Type of object to map to.</typeparam>
+        /// <returns>An object containing a single <typeparamref name="T"/> typed object, and a collection of key-value pairs with the output parameters.</returns>
+        StoredProcedureWithOutputResult<T> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToMappedObjectSingle<T>()
+        {
+            var parameters = new DynamicParameters();
+            foreach (var parameter in _spParameters)
+            {
+                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
+                parameters.Add(nameParameter, parameter.Value);
+            }
+            foreach (OutputParameter outputParameter in _spOutputParameters)
+            {
+                string outputParameterName = outputParameter.Name.StartsWith("@") ? outputParameter.Name : $"@{outputParameter.Name}";
+                parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
+            }
+
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
+
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                var result = connection.QueryFirstOrDefault<T>(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
+
+                foreach (OutputParameter outputParameter in _spOutputParameters)
+                {
+                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
+                    {
+                        object value = parameters.Get<object>(outputParameter.Name);
+                        outputParameters.Add(outputParameter.Name, value);
+                    }
+                }
+
+                return new StoredProcedureWithOutputResult<T>(result, outputParameters);
             }
             finally
             {
@@ -1222,10 +1488,41 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
-        /// Executes the Stored Procedure as a query asynchronously, and returns a collection of <typeparamref name="T"/> typed objects and a collection of output parameters.
+        /// Executes the Stored Procedure as a query asynchronously, and returns a single dynamic object.
+        /// </summary>
+        /// <returns>A task with a single dynamic object, or default.</returns>
+        public async Task<dynamic> ExecuteToDynamicSingleAsync()
+        {
+            var parameters = new DynamicParameters();
+            foreach (var parameter in _spParameters)
+            {
+                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
+                parameters.Add(nameParameter, parameter.Value);
+            }
+
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+
+                return await connection.QueryFirstOrDefaultAsync(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes the Stored Procedure as a query asynchronously, and returns a collection of <typeparamref name="T"/> typed objects.
         /// </summary>
         /// <typeparam name="T">Type of object to map to.</typeparam>
-        /// <param name="outputParameters">Collection of key-value pairs containing the output parameters.</param>
         /// <returns>A task with a collection of <typeparamref name="T"/> typed objects, representing a row each.</returns>
         public async Task<IEnumerable<T>> ExecuteToMappedObjectAsync<T>()
         {
@@ -1256,10 +1553,43 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes the Stored Procedure as a query asynchronously, and returns a single <typeparamref name="T"/> typed object.
+        /// </summary>
+        /// <typeparam name="T">Type of object to map to.</typeparam>
+        /// <returns>A task with a single <typeparamref name="T"/> typed object, or default.</returns>
+        public async Task<T> ExecuteToMappedObjectSingleAsync<T>()
+        {
+            var parameters = new DynamicParameters();
+            foreach (var parameter in _spParameters)
+            {
+                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
+                parameters.Add(nameParameter, parameter.Value);
+            }
+
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+
+                return await connection.QueryFirstOrDefaultAsync<T>(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes the Stored Procedure as a non-query asynchronously, returning the affected rows and the output parameters.
         /// </summary>
         /// <returns>A task with an object containing the affected rows and a collection of key-value pairs with the output parameters.</returns>
-        async Task<StoredProcedureWithOutputResult<int>> IFluentSqlExecuteStoredProcedureOutputParameterStatement.ExecuteNonQueryAsync()
+        async Task<StoredProcedureWithOutputResult<int>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteNonQueryAsync()
         {
             var parameters = new DynamicParameters();
             foreach (var parameter in _spParameters)
@@ -1309,7 +1639,7 @@ namespace FluentSQL.Core
         /// Executes the Stored Procedure as a query asynchronously, and returns a collection of dynamic objects and a collection of output parameters.
         /// </summary>
         /// <returns>A task with an object containing a collection of dynamic objects and a collection of key-value pairs with the output parameters.</returns>
-        async Task<StoredProcedureWithOutputResult<IEnumerable<dynamic>>> IFluentSqlExecuteStoredProcedureOutputParameterStatement.ExecuteToDynamicAsync()
+        async Task<StoredProcedureWithOutputResult<IEnumerable<dynamic>>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToDynamicAsync()
         {
             var parameters = new DynamicParameters();
             foreach (var parameter in _spParameters)
@@ -1355,11 +1685,60 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes the Stored Procedure as a query asynchronously, and returns a single dynamic object and a collection of output parameters.
+        /// </summary>
+        /// <returns>A task with an object containing a single dynamic object and a collection of key-value pairs with the output parameters.</returns>
+        async Task<StoredProcedureWithOutputResult<dynamic>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToDynamicSingleAsync()
+        {
+            var parameters = new DynamicParameters();
+            foreach (var parameter in _spParameters)
+            {
+                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
+                parameters.Add(nameParameter, parameter.Value);
+            }
+            foreach (OutputParameter outputParameter in _spOutputParameters)
+            {
+                string outputParameterName = outputParameter.Name.StartsWith("@") ? outputParameter.Name : $"@{outputParameter.Name}";
+                parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
+            }
+
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
+
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                var result = await connection.QueryFirstOrDefaultAsync(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
+
+                foreach (OutputParameter outputParameter in _spOutputParameters)
+                {
+                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
+                    {
+                        object value = parameters.Get<object>(outputParameter.Name);
+                        outputParameters.Add(outputParameter.Name, value);
+                    }
+                }
+
+                return new StoredProcedureWithOutputResult<dynamic>(result, outputParameters);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes the Stored Procedure as a query asynchronously, and returns a collection of <typeparamref name="T"/> typed objects and a collection of output parameters.
         /// </summary>
         /// <typeparam name="T">Type of object to map to.</typeparam>
         /// <returns>An object containing a collection of <typeparamref name="T"/> typed objects representing a row each, and a collection of key-value pairs with the output parameters.</returns>
-        async Task<StoredProcedureWithOutputResult<IEnumerable<T>>> IFluentSqlExecuteStoredProcedureOutputParameterStatement.ExecuteToMappedObjectAsync<T>()
+        async Task<StoredProcedureWithOutputResult<IEnumerable<T>>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToMappedObjectAsync<T>()
         {
             var parameters = new DynamicParameters();
             foreach (var parameter in _spParameters)
@@ -1394,6 +1773,56 @@ namespace FluentSQL.Core
                 }
 
                 return new StoredProcedureWithOutputResult<IEnumerable<T>>(result, outputParameters);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes the Stored Procedure as a query asynchronously, and returns a single <typeparamref name="T"/> typed object and a collection of output parameters.
+        /// </summary>
+        /// <typeparam name="T">Type of object to map to.</typeparam>
+        /// <returns>An object containing a single <typeparamref name="T"/> typed object, and a collection of key-value pairs with the output parameters.</returns>
+        async Task<StoredProcedureWithOutputResult<T>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToMappedObjectSingleAsync<T>()
+        {
+            var parameters = new DynamicParameters();
+            foreach (var parameter in _spParameters)
+            {
+                string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
+                parameters.Add(nameParameter, parameter.Value);
+            }
+            foreach (OutputParameter outputParameter in _spOutputParameters)
+            {
+                string outputParameterName = outputParameter.Name.StartsWith("@") ? outputParameter.Name : $"@{outputParameter.Name}";
+                parameters.Add(outputParameterName, null, outputParameter.Type, ParameterDirection.Output, outputParameter.Size, outputParameter.Precision, outputParameter.Scale);
+            }
+
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            Dictionary<string, object> outputParameters = new Dictionary<string, object>();
+
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                T result = await connection.QueryFirstOrDefaultAsync<T>(_spName, parameters, _transaction, commandTimeout: Timeout, commandType: CommandType.StoredProcedure);
+
+                foreach (OutputParameter outputParameter in _spOutputParameters)
+                {
+                    if (parameters.ParameterNames.Any(p => p.Trim() == outputParameter.Name.Trim()))
+                    {
+                        object value = parameters.Get<object>(outputParameter.Name);
+                        outputParameters.Add(outputParameter.Name, value);
+                    }
+                }
+
+                return new StoredProcedureWithOutputResult<T>(result, outputParameters);
             }
             finally
             {
@@ -1517,6 +1946,57 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes a custom query, and returns a single dynamic object.
+        /// </summary>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <returns>A single dynamic object.</returns>
+        public dynamic ExecuteCustomQuerySingle(string sqlQuery)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return connection.QueryFirstOrDefault(sqlQuery, transaction: _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes a custom query, and returns a single dynamic object.
+        /// </summary>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Object with properties matching the ones specified inside <paramref name="sqlQuery"/>.</param>
+        /// <returns>A single dynamic object.</returns>
+        public dynamic ExecuteCustomQuerySingle(string sqlQuery, object parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return connection.QueryFirstOrDefault(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes a custom query, and returns a collection of <typeparamref name="T"/> typed objects.
         /// </summary>
         /// <typeparam name="T">Type of object to map to.</typeparam>
@@ -1559,6 +2039,59 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
                 return connection.Query<T>(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes a custom query, and returns a single <typeparamref name="T"/> typed object.
+        /// </summary>
+        /// <typeparam name="T">Type of object to map to.</typeparam>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <returns>A single <typeparamref name="T"/> typed object, or default.</returns>
+        public T ExecuteCustomQuerySingle<T>(string sqlQuery)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return connection.QueryFirstOrDefault<T>(sqlQuery, transaction: _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes a custom query, and returns a single <typeparamref name="T"/> typed object.
+        /// </summary>
+        /// <typeparam name="T">Type of object to map to.</typeparam>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Object with properties matching the ones specified inside <paramref name="sqlQuery"/>.</param>
+        /// <returns>A single <typeparamref name="T"/> typed object, or default.</returns>
+        public T ExecuteCustomQuerySingle<T>(string sqlQuery, object parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return connection.QueryFirstOrDefault<T>(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -1676,6 +2209,57 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes a custom query asynchronously, and returns a single dynamic object.
+        /// </summary>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <returns>A task with a single dynamic object, or default.</returns>
+        public async Task<dynamic> ExecuteCustomQuerySingleAsync(string sqlQuery)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return await connection.QueryFirstOrDefaultAsync(sqlQuery, transaction: _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes a custom query asynchronously, and returns a single dynamic object.
+        /// </summary>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Object with properties matching the ones specified inside <paramref name="sqlQuery"/>.</param>
+        /// <returns>A task with a single dynamic object.</returns>
+        public async Task<dynamic> ExecuteCustomQuerySingleAsync(string sqlQuery, object parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return await connection.QueryFirstOrDefaultAsync(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes a custom query asynchronously, and returns a collection of <typeparamref name="T"/> typed objects.
         /// </summary>
         /// <typeparam name="T">Type of object to map to.</typeparam>
@@ -1718,6 +2302,59 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
                 return await connection.QueryAsync<T>(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes a custom query asynchronously, and returns a single <typeparamref name="T"/> typed object.
+        /// </summary>
+        /// <typeparam name="T">Type of object to map to.</typeparam>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <returns>A task with a single <typeparamref name="T"/> typed object, or default.</returns>
+        public async Task<T> ExecuteCustomQuerySingleAsync<T>(string sqlQuery)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return await connection.QueryFirstOrDefaultAsync<T>(sqlQuery, transaction: _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes a custom query asynchronously, and returns a single <typeparamref name="T"/> typed object.
+        /// </summary>
+        /// <typeparam name="T">Type of object to map to.</typeparam>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Object with properties matching the ones specified inside <paramref name="sqlQuery"/>.</param>
+        /// <returns>A task with a single <typeparamref name="T"/> typed object, or default.</returns>
+        public async Task<T> ExecuteCustomQuerySingleAsync<T>(string sqlQuery, object parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return await connection.QueryFirstOrDefaultAsync<T>(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
             }
             finally
             {

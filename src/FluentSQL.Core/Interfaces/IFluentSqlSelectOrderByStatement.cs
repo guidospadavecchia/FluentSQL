@@ -3,18 +3,12 @@ using System.Threading.Tasks;
 
 namespace FluentSQL.Core
 {
-    public interface IFluentSqlSelectOrderByStatement
+    public interface IFluentSqlSelectOrderByStatement : IFluentSqlQueryEnd
     {
         string Query { get; }
         int? Timeout { get; }
 
         IFluentSqlSelectOrderByAscendingDescendingStatement Ascending();
         IFluentSqlSelectOrderByAscendingDescendingStatement Descending();
-
-        IEnumerable<dynamic> ToDynamic();
-        IEnumerable<T> ToMappedObject<T>();
-
-        Task<IEnumerable<dynamic>> ToDynamicAsync();
-        Task<IEnumerable<T>> ToMappedObjectAsync<T>();
     }
 }

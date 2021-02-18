@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
 
 namespace FluentSQL.Core
 {
-    public interface IFluentSqlExecuteStoredProcedureOutputParameterStatement
+    public interface IFluentSqlExecuteStoredProcedureOutputParameterStatement : IFluentSqlStoredProcedureWithOutputEnd
     {
         string Name { get; }
         int? Timeout { get; }
@@ -15,13 +14,5 @@ namespace FluentSQL.Core
         IFluentSqlExecuteStoredProcedureOutputParameterStatement WithOutputParameter(string name, DbType type, int size);
         IFluentSqlExecuteStoredProcedureOutputParameterStatement WithOutputParameter(string name, DbType type, byte precision, byte scale);
         IFluentSqlExecuteStoredProcedureOutputParameterStatement WithOutputParameter(string name, DbType type, int? size = null, byte? precision = null, byte? scale = null);
-
-        StoredProcedureWithOutputResult<int> ExecuteNonQuery();
-        StoredProcedureWithOutputResult<IEnumerable<dynamic>> ExecuteToDynamic();
-        StoredProcedureWithOutputResult<IEnumerable<T>> ExecuteToMappedObject<T>();
-
-        Task<StoredProcedureWithOutputResult<int>> ExecuteNonQueryAsync();
-        Task<StoredProcedureWithOutputResult<IEnumerable<dynamic>>> ExecuteToDynamicAsync();
-        Task<StoredProcedureWithOutputResult<IEnumerable<T>>> ExecuteToMappedObjectAsync<T>();
     }
 }

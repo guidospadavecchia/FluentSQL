@@ -20,15 +20,23 @@ namespace FluentSQL.Core
 
         IEnumerable<dynamic> ExecuteCustomQuery(string sqlQuery);
         IEnumerable<dynamic> ExecuteCustomQuery(string sqlQuery, object parameters);
+        dynamic ExecuteCustomQuerySingle(string sqlQuery);
+        dynamic ExecuteCustomQuerySingle(string sqlQuery, object parameters);
         IEnumerable<T> ExecuteCustomQuery<T>(string sqlQuery);
         IEnumerable<T> ExecuteCustomQuery<T>(string sqlQuery, object parameters);
+        T ExecuteCustomQuerySingle<T>(string sqlQuery);
+        T ExecuteCustomQuerySingle<T>(string sqlQuery, object parameters);
         int ExecuteCustomNonQuery(string sqlQuery);
         int ExecuteCustomNonQuery(string sqlQuery, object parameters);
 
         Task<IEnumerable<dynamic>> ExecuteCustomQueryAsync(string sqlQuery);
         Task<IEnumerable<dynamic>> ExecuteCustomQueryAsync(string sqlQuery, object parameters);
+        Task<dynamic> ExecuteCustomQuerySingleAsync(string sqlQuery);
+        Task<dynamic> ExecuteCustomQuerySingleAsync(string sqlQuery, object parameters);
         Task<IEnumerable<T>> ExecuteCustomQueryAsync<T>(string sqlQuery);
         Task<IEnumerable<T>> ExecuteCustomQueryAsync<T>(string sqlQuery, object parameters);
+        Task<T> ExecuteCustomQuerySingleAsync<T>(string sqlQuery);
+        Task<T> ExecuteCustomQuerySingleAsync<T>(string sqlQuery, object parameters);
         Task<int> ExecuteCustomNonQueryAsync(string sqlQuery);
         Task<int> ExecuteCustomNonQueryAsync(string sqlQuery, object parameters);
 

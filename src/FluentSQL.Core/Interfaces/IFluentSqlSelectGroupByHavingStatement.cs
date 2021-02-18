@@ -1,19 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace FluentSQL.Core
+﻿namespace FluentSQL.Core
 {
-    public interface IFluentSqlSelectGroupByHavingStatement
+    public interface IFluentSqlSelectGroupByHavingStatement : IFluentSqlQueryEnd
     {
         string Query { get; }
         int? Timeout { get; }
 
         IFluentSqlSelectOrderByStatement OrderBy(params string[] columns);
-
-        IEnumerable<dynamic> ToDynamic();
-        IEnumerable<T> ToMappedObject<T>();
-
-        Task<IEnumerable<dynamic>> ToDynamicAsync();
-        Task<IEnumerable<T>> ToMappedObjectAsync<T>();
     }
 }
