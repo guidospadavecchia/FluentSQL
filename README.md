@@ -355,9 +355,13 @@ IEnumerable<Customer> result = fsql.ExecuteCustomQuery<Customer>("SELECT * FROM 
 
 All available end methods can be executed asynchronously. If there's an `Execute()`, there is also an awaitable `ExecuteAsync()`, and so on.
 
+***
+
 ## Single results
 
 All available end methods can be executed as a single result (if you are sure your condition will return a single value). If there's a `IEnumerable<dynamic> ToDynamic()`, there is also a `dynamic ToDynamicSingle()`, and so on.
+
+***
 
 ## Contributions
 
