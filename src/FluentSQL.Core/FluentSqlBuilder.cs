@@ -1659,6 +1659,32 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes a custom non-query.
+        /// </summary>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Collection of key-value pairs containing the parameter names and values.</param>
+        /// <returns>Affected rows.</returns>
+        public int ExecuteCustomNonQuery(string sqlQuery, Dictionary<string, object> parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return connection.Execute(sqlQuery, new DynamicParameters(parameters), _transaction, Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes a custom query, and returns a collection of dynamic objects.
         /// </summary>
         /// <param name="sqlQuery">Custom SQL query to execute.</param>
@@ -1710,6 +1736,32 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes a custom query, and returns a collection of dynamic objects.
+        /// </summary>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Collection of key-value pairs containing the parameter names and values.</param>
+        /// <returns>A collection of dynamic objects.</returns>
+        public IEnumerable<dynamic> ExecuteCustomQuery(string sqlQuery, Dictionary<string, object> parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return connection.Query(sqlQuery, new DynamicParameters(parameters), _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes a custom query, and returns a single dynamic object.
         /// </summary>
         /// <param name="sqlQuery">Custom SQL query to execute.</param>
@@ -1750,6 +1802,32 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
                 return connection.QueryFirstOrDefault(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes a custom query, and returns a single dynamic object.
+        /// </summary>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Collection of key-value pairs containing the parameter names and values.</param>
+        /// <returns>A single dynamic object.</returns>
+        public dynamic ExecuteCustomQuerySingle(string sqlQuery, Dictionary<string, object> parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return connection.QueryFirstOrDefault(sqlQuery, new DynamicParameters(parameters), _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -1814,6 +1892,33 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes a custom query, and returns a collection of <typeparamref name="T"/> typed objects.
+        /// </summary>
+        /// <typeparam name="T">Type of object to map to.</typeparam>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Collection of key-value pairs containing the parameter names and values.</param>
+        /// <returns>A collection of <typeparamref name="T"/> typed objects, representing a row each.</returns>
+        public IEnumerable<T> ExecuteCustomQuery<T>(string sqlQuery, Dictionary<string, object> parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return connection.Query<T>(sqlQuery, new DynamicParameters(parameters), _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes a custom query, and returns a single <typeparamref name="T"/> typed object.
         /// </summary>
         /// <typeparam name="T">Type of object to map to.</typeparam>
@@ -1856,6 +1961,33 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
                 return connection.QueryFirstOrDefault<T>(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes a custom query, and returns a single <typeparamref name="T"/> typed object.
+        /// </summary>
+        /// <typeparam name="T">Type of object to map to.</typeparam>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Collection of key-value pairs containing the parameter names and values.</param>
+        /// <returns>A single <typeparamref name="T"/> typed object, or default.</returns>
+        public T ExecuteCustomQuerySingle<T>(string sqlQuery, Dictionary<string, object> parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return connection.QueryFirstOrDefault<T>(sqlQuery, new DynamicParameters(parameters), _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -1922,6 +2054,32 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes a custom non-query asynchronously.
+        /// </summary>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Collection of key-value pairs containing the parameter names and values.</param>
+        /// <returns>A task with the affected rows.</returns>
+        public async Task<int> ExecuteCustomNonQueryAsync(string sqlQuery, Dictionary<string, object> parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return await connection.ExecuteAsync(sqlQuery, new DynamicParameters(parameters), _transaction, Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes a custom query asynchronously, and returns a collection of dynamic objects.
         /// </summary>
         /// <param name="sqlQuery">Custom SQL query to execute.</param>
@@ -1973,6 +2131,32 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes a custom query asynchronously, and returns a collection of dynamic objects.
+        /// </summary>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Collection of key-value pairs containing the parameter names and values.</param>
+        /// <returns>A task with a collection of dynamic objects.</returns>
+        public async Task<IEnumerable<dynamic>> ExecuteCustomQueryAsync(string sqlQuery, Dictionary<string, object> parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return await connection.QueryAsync(sqlQuery, new DynamicParameters(parameters), _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes a custom query asynchronously, and returns a single dynamic object.
         /// </summary>
         /// <param name="sqlQuery">Custom SQL query to execute.</param>
@@ -2013,6 +2197,32 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
                 return await connection.QueryFirstOrDefaultAsync(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes a custom query asynchronously, and returns a single dynamic object.
+        /// </summary>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Collection of key-value pairs containing the parameter names and values.</param>
+        /// <returns>A task with a single dynamic object.</returns>
+        public async Task<dynamic> ExecuteCustomQuerySingleAsync(string sqlQuery, Dictionary<string, object> parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return await connection.QueryFirstOrDefaultAsync(sqlQuery, new DynamicParameters(parameters), _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -2077,6 +2287,33 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Executes a custom query asynchronously, and returns a collection of <typeparamref name="T"/> typed objects.
+        /// </summary>
+        /// <typeparam name="T">Type of object to map to.</typeparam>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Collection of key-value pairs containing the parameter names and values.</param>
+        /// <returns>A task with a collection of <typeparamref name="T"/> typed objects, representing a row each.</returns>
+        public async Task<IEnumerable<T>> ExecuteCustomQueryAsync<T>(string sqlQuery, Dictionary<string, object> parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return await connection.QueryAsync<T>(sqlQuery, new DynamicParameters(parameters), _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executes a custom query asynchronously, and returns a single <typeparamref name="T"/> typed object.
         /// </summary>
         /// <typeparam name="T">Type of object to map to.</typeparam>
@@ -2119,6 +2356,33 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
                 return await connection.QueryFirstOrDefaultAsync<T>(sqlQuery, parameters, _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes a custom query asynchronously, and returns a single <typeparamref name="T"/> typed object.
+        /// </summary>
+        /// <typeparam name="T">Type of object to map to.</typeparam>
+        /// <param name="sqlQuery">Custom SQL query to execute.</param>
+        /// <param name="parameters">Collection of key-value pairs containing the parameter names and values.</param>
+        /// <returns>A task with a single <typeparamref name="T"/> typed object, or default.</returns>
+        public async Task<T> ExecuteCustomQuerySingleAsync<T>(string sqlQuery, Dictionary<string, object> parameters)
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                return await connection.QueryFirstOrDefaultAsync<T>(sqlQuery, new DynamicParameters(parameters), _transaction, commandTimeout: Timeout);
             }
             finally
             {
