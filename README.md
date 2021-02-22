@@ -76,6 +76,11 @@ IEnumerable<dynamic> result = fsql.Select("C.Name", "C.Surname").From("Customers
 ```csharp
 IEnumerable<dynamic> result = fsql.SelectAll().Distinct().Top(100).From("Customers").Where("ID > 5").ToDynamic();
 ```
+```csharp
+Dictionary<string, object> whereParameters = new Dictionary<string, object>();
+whereParameters.Add("Id", 5);
+IEnumerable<dynamic> result = fsql.SelectAll().Distinct().Top(100).From("Customers").Where("ID > @Id", whereParameters).ToDynamic();
+```
 
 #### Full example using all available chaining methods for Select
 ```csharp
@@ -113,7 +118,9 @@ public class CustomerDTO
     public DateTime CreationDate;
 }
 
-IEnumerable<CustomerDTO> result = fsql.SelectAll().From("Customers").Where("ID IN (1, 2, 3)").ToMappedObject<CustomerDTO>();
+Dictionary<string, object> whereParameters = new Dictionary<string, object>();
+whereParameters.Add("Ids", new [] { 1, 2, 3 });
+IEnumerable<CustomerDTO> result = fsql.SelectAll().From("Customers").Where("ID IN @Ids", whereParameters).ToMappedObject<CustomerDTO>();
 CustomerDTO firstCustomer = lista.ElementAt(0);
 
 int id = firstCustomer.ID;
@@ -130,18 +137,31 @@ This non-query methods can start from `InsertInto()`, `Update()` or `DeleteFrom(
 ### Insert
 Returns the affected rows.
 ```csharp
+Dictionary<string, object> values = new Dictionary<string, object>();
+values.Add("Description", "Argentine Peso");
+values.Add("Code", "AR");
+values.Add("CountryCode", "ARG");
+values.Add("MaxNoteValue", 1000);
+values.Add("MinNoteValue", 5);
+
 int affectedRows = fsql.InsertInto("Currencies")
-                       .Columns("Description", "Code", "CountryCode", "MaxNoteValue", "MinNoteValue")
-                       .Values("Argentine Peso", "AR", "ARG", 1000, 5)
+                       .Values(values)
                        .Execute();
 ```
 
 ### Update
 Returns the affected rows.
 ```csharp
+Dictionary<string, object> assignments = new Dictionary<string, object>();
+assignments.Add("Description", "U.S. Dollar");
+assignments.Add("Code", "US");
+
+Dictionary<string, object> whereParameters = new Dictionary<string, object>();
+whereParameters.Add("Id", 2);
+
 int affectedRows = fsql.Update("Currencies")
-                       .Set("Description = 'U.S. Dollar'", "Code = 'US'")
-                       .Where("ID = 2")
+                       .Set(assignments)
+                       .Where("ID = @Id", whereParameters)
                        .Execute();
 ```
 
@@ -160,8 +180,12 @@ int affectedRows = fsql.Update("Currencies")
 ### Delete
 Returns the affected rows.
 ```csharp
+
+Dictionary<string, object> whereParameters = new Dictionary<string, object>();
+whereParameters.Add("Id", 2);
+
 int affectedRows = fsql.DeleteFrom("Currencies")
-                       .Where("ID = 2")
+                       .Where("ID = @Id", whereParameters)
                        .Execute();
 ```
 
@@ -317,7 +341,11 @@ public class Customer
     public string Surname;
 }
 
-IEnumerable<Customer> result = fsql.ExecuteCustomQuery<Customer>("SELECT * FROM Customers WHERE ID BETWEEN 1 AND 100");
+Dictionary<string, object> params = new Dictionary<string, object>();
+params.Add("IdMin", 1);
+params.Add("IdMax", 100);
+
+IEnumerable<Customer> result = fsql.ExecuteCustomQuery<Customer>("SELECT * FROM Customers WHERE ID BETWEEN @IdMin AND @IdMax", params);
 ```
 
 ### Custom queries with no return values
