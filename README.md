@@ -63,7 +63,7 @@ Alternatively, you can set a global timeout using the static `FluentSqlBuilder.S
 FluentSqlBuilder.SetGlobalTimeout(30);
 ```
 
-**Order of priority**: First, the query timeout will be used, if not set, the global timeout will be used, and if not set, the default SQL timeout will be used.
+**Order of priority**: First, the **query timeout** will be used, if not set, the **global timeout** will be used, and if not set, the **default SQL timeout** will be used.
 
 ***
 
@@ -71,15 +71,28 @@ FluentSqlBuilder.SetGlobalTimeout(30);
 
 #### Simple Select
 ```csharp
-IEnumerable<dynamic> result = fsql.Select("C.Name", "C.Surname").From("Customers", "C").ToDynamic();
+IEnumerable<dynamic> result = fsql.Select("C.Name", "C.Surname")
+                                  .From("Customers", "C")
+                                  .ToDynamic();
 ```
 ```csharp
-IEnumerable<dynamic> result = fsql.SelectAll().Distinct().Top(100).From("Customers").Where("ID > 5").ToDynamic();
+IEnumerable<dynamic> result = fsql.SelectAll()
+                                  .Distinct()
+                                  .Top(100)
+                                  .From("Customers")
+                                  .Where("ID > 5")
+                                  .ToDynamic();
 ```
 ```csharp
 Dictionary<string, object> whereParameters = new Dictionary<string, object>();
 whereParameters.Add("Id", 5);
-IEnumerable<dynamic> result = fsql.SelectAll().Distinct().Top(100).From("Customers").Where("ID > @Id", whereParameters).ToDynamic();
+
+IEnumerable<dynamic> result = fsql.SelectAll()
+                                  .Distinct()
+                                  .Top(100)
+                                  .From("Customers")
+                                  .Where("ID > @Id", whereParameters)
+                                  .ToDynamic();
 ```
 
 #### Full example using all available chaining methods for Select
@@ -101,7 +114,10 @@ var result = fsql.Select("C.ID", "C.Name", "C.Surname", "COUNT(I.ID)")
 The `Select()` method, when executed, can return a collection of dynamic objects (`IEnumerable<dynamic>`) whose properties match the columns specified, or map to a specified DTO (`IEnumerable<T>`):
 
 ```csharp
-IEnumerable<dynamic> result = fsql.Select("C.ID", "C.Name", "C.Surname").From("Customers", "C").ToDynamic();
+IEnumerable<dynamic> result = fsql.Select("C.ID", "C.Name", "C.Surname")
+                                  .From("Customers", "C")
+                                  .ToDynamic();
+                                  
 dynamic firstCustomer = result.ElementAt(0);
 
 int id = firstCustomer.ID;
@@ -120,7 +136,11 @@ public class CustomerDTO
 
 Dictionary<string, object> whereParameters = new Dictionary<string, object>();
 whereParameters.Add("Ids", new [] { 1, 2, 3 });
-IEnumerable<CustomerDTO> result = fsql.SelectAll().From("Customers").Where("ID IN @Ids", whereParameters).ToMappedObject<CustomerDTO>();
+IEnumerable<CustomerDTO> result = fsql.SelectAll()
+                                      .From("Customers")
+                                      .Where("ID IN @Ids", whereParameters)
+                                      .ToMappedObject<CustomerDTO>();
+                                      
 CustomerDTO firstCustomer = lista.ElementAt(0);
 
 int id = firstCustomer.ID;
