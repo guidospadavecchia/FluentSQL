@@ -394,6 +394,17 @@ namespace FluentSQL.Core
         }
 
         /// <summary>
+        /// Applies the ON keyword after a JOIN, using the specified condition.
+        /// </summary>
+        /// <param name="condition">Join condition.</param>
+        /// <param name="parameters">Collection of key-value pairs containing parameter names and values.</param>
+        public IFluentSqlSelectJoinOnStatement On(string condition, Dictionary<string, object> parameters)
+        {
+            AddQueryParameters(parameters);
+            return On(condition);
+        }
+
+        /// <summary>
         /// Applies the WITH (NOLOCK) modifier, to read records without blocking the table.
         /// </summary>
         IFluentSqlSelectJoinOnWithNoLockStatement IFluentSqlSelectJoinOnStatement.WithNoLock()
@@ -410,6 +421,17 @@ namespace FluentSQL.Core
         {
             _query = $"{_query} WHERE {condition}";
             return this;
+        }
+
+        /// <summary>
+        /// Applies the WHERE operator using the specified condition.
+        /// </summary>
+        /// <param name="condition">Filter condition.</param>
+        /// <param name="parameters">Collection of key-value pairs containing parameter names and values.</param>
+        public IFluentSqlSelectWhereStatement Where(string condition, Dictionary<string, object> parameters)
+        {
+            AddQueryParameters(parameters);
+            return Where(condition);
         }
 
         /// <summary>
@@ -430,6 +452,17 @@ namespace FluentSQL.Core
         {
             _query = $"{_query} HAVING {condition}";
             return this;
+        }
+
+        /// <summary>
+        /// Applies the HAVING keyword after a GROUP BY, using the specified condition.
+        /// </summary>
+        /// <param name="condition">Filter GROUP BY condition.</param>
+        /// <param name="parameters">Collection of key-value pairs containing parameter names and values.</param>
+        public IFluentSqlSelectGroupByHavingStatement Having(string condition, Dictionary<string, object> parameters)
+        {
+            AddQueryParameters(parameters);
+            return Having(condition);
         }
 
         /// <summary>
@@ -603,7 +636,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return connection.Query(_query, transaction: _transaction, commandTimeout: Timeout);
+                return connection.Query(_query, _queryParameters, _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -628,7 +661,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return connection.QueryFirstOrDefault(_query, transaction: _transaction, commandTimeout: Timeout);
+                return connection.QueryFirstOrDefault(_query, _queryParameters, _transaction, Timeout);
             }
             finally
             {
@@ -654,7 +687,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return connection.Query<T>(_query, transaction: _transaction, commandTimeout: Timeout);
+                return connection.Query<T>(_query, _queryParameters, _transaction, commandTimeout: Timeout);
             }
             finally
             {
@@ -680,7 +713,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return connection.QueryFirstOrDefault<T>(_query, transaction: _transaction, commandTimeout: Timeout);
+                return connection.QueryFirstOrDefault<T>(_query, _queryParameters, _transaction, Timeout);
             }
             finally
             {
@@ -734,7 +767,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return await connection.QueryAsync(_query, transaction: _transaction, commandTimeout: Timeout);
+                return await connection.QueryAsync(_query, _queryParameters, _transaction, Timeout);
             }
             finally
             {
@@ -759,7 +792,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return await connection.QueryFirstOrDefaultAsync(_query, transaction: _transaction, commandTimeout: Timeout);
+                return await connection.QueryFirstOrDefaultAsync(_query, _queryParameters, _transaction, Timeout);
             }
             finally
             {
@@ -785,7 +818,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return await connection.QueryAsync<T>(_query, transaction: _transaction, commandTimeout: Timeout);
+                return await connection.QueryAsync<T>(_query, _queryParameters, _transaction, Timeout);
             }
             finally
             {
@@ -811,7 +844,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return await connection.QueryFirstOrDefaultAsync<T>(_query, transaction: _transaction, commandTimeout: Timeout);
+                return await connection.QueryFirstOrDefaultAsync<T>(_query, _queryParameters, _transaction, Timeout);
             }
             finally
             {
