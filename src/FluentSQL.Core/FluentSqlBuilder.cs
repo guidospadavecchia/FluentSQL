@@ -12,7 +12,7 @@ namespace FluentSQL.Core
     /// <summary>
     /// Fluent API for SQL queries.
     /// </summary>
-    public sealed class FluentSqlBuilder : IFluentSql, IFluentSqlSelectStatement, IFluentSqlSelectDistinctStatement, IFluentSqlSelectTopStatement, IFluentSqlSelectFromStatement, IFluentSqlSelectFromWithNoLockStatement, IFluentSqlSelectWhereStatement, IFluentSqlSelectOrderByStatement, IFluentSqlSelectOrderByAscendingDescendingStatement, IFluentSqlSelectGroupByStatement, IFluentSqlSelectGroupByHavingStatement, IFluentSqlSelectJoinStatement, IFluentSqlSelectJoinOnStatement, IFluentSqlSelectJoinOnWithNoLockStatement, IFluentSqlInsertStatement, IFluentSqlInsertColumnsStatement, IFluentSqlInsertValuesStatement, IFluentSqlUpdateStatement, IFluentSqlUpdateSetStatement, IFluentSqlNonQueryWhereStatement, IFluentSqlDeleteStatement, IFluentSqlExecuteStoredProcedureStatement, IFluentSqlExecuteStoredProcedureParameterStatement, IFluentSqlExecuteStoredProcedureOutputParameterStatement
+    public sealed class FluentSqlBuilder : IFluentSql, IFluentSqlSelectStatement, IFluentSqlSelectDistinctStatement, IFluentSqlSelectTopStatement, IFluentSqlSelectFromStatement, IFluentSqlSelectFromWithNoLockStatement, IFluentSqlSelectWhereStatement, IFluentSqlSelectOrderByStatement, IFluentSqlSelectOrderByAscendingDescendingStatement, IFluentSqlSelectGroupByStatement, IFluentSqlSelectGroupByHavingStatement, IFluentSqlSelectJoinStatement, IFluentSqlSelectJoinOnStatement, IFluentSqlSelectJoinOnWithNoLockStatement, IFluentSqlInsertStatement, IFluentSqlInsertValuesStatement, IFluentSqlUpdateStatement, IFluentSqlUpdateSetStatement, IFluentSqlNonQueryWhereStatement, IFluentSqlDeleteStatement, IFluentSqlExecuteStoredProcedureStatement, IFluentSqlExecuteStoredProcedureParameterStatement, IFluentSqlExecuteStoredProcedureOutputParameterStatement
     {
         #region Vars
 
@@ -25,6 +25,7 @@ namespace FluentSQL.Core
         private IDbConnection _connection = null;
         private IDbTransaction _transaction = null;
         private bool _inTransaction;
+        private DynamicParameters _queryParameters;
         private Dictionary<string, object> _spParameters = new Dictionary<string, object>();
         private List<OutputParameter> _spOutputParameters = new List<OutputParameter>();
 
@@ -269,9 +270,9 @@ namespace FluentSQL.Core
 
         #endregion
 
-        #region Selects
+        #region CRUD
 
-        #region Query Builder
+        #region Select
 
         /// <summary>
         /// Initializes a SELECT statement with the specified columns.
@@ -279,6 +280,7 @@ namespace FluentSQL.Core
         /// <param name="columns">Columnas a devolver en la sentencia SELECT.</param>
         public IFluentSqlSelectStatement Select(params string[] columns)
         {
+            _queryParameters = new DynamicParameters();
             _query = $"SELECT {string.Join(", ", columns)}";
             return this;
         }
@@ -288,6 +290,7 @@ namespace FluentSQL.Core
         /// </summary>
         public IFluentSqlSelectStatement SelectAll()
         {
+            _queryParameters = new DynamicParameters();
             _query = "SELECT *";
             return this;
         }
@@ -459,6 +462,129 @@ namespace FluentSQL.Core
 
         #endregion
 
+        #region Insert
+
+        /// <summary>
+        /// Initializes an INSERT statement against the specified table.
+        /// </summary>
+        /// <param name="table">Name of the table.</param>
+        public IFluentSqlInsertStatement InsertInto(string table)
+        {
+            _queryParameters = new DynamicParameters();
+            _query = $"INSERT INTO {table}";
+            return this;
+        }
+
+        /// <summary>
+        /// Indicates the columns and values to insert.
+        /// </summary>
+        /// <param name="values">Collection of key-value pairs containing parameter names and values to be inserted.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="values"/> is null or empty.</exception>
+        public IFluentSqlInsertValuesStatement Values(Dictionary<string, object> values)
+        {
+            if (values == null || values.Count == 0)
+            {
+                throw new ArgumentException("Debe ejecutar la consulta con al menos un valor");
+            }
+
+            _query = $"{_query} ({string.Join(", ", values.Select(x => x.Key))})";
+
+            string insertValues = string.Empty;
+            foreach (var value in values)
+            {
+                string valueParameter = value.Key.StartsWith("@") ? value.Key : $"@{value.Key}";
+                insertValues += $"{valueParameter}, ";
+            }
+            insertValues = insertValues.Remove(insertValues.Length - 2);
+
+            AddQueryParameters(values);
+            _query = $" {_query} VALUES ({insertValues})";
+            return this;
+        }
+
+        #endregion
+
+        #region Update
+
+        /// <summary>
+        /// Initializes an UPDATE statement against the specified table.
+        /// </summary>
+        /// <param name="table">Nombre de la tabla.</param>
+        public IFluentSqlUpdateStatement Update(string table)
+        {
+            _queryParameters = new DynamicParameters();
+            _query = $"UPDATE {table}";
+            return this;
+        }
+
+        /// <summary>
+        /// Indicates the assignments to be done by the UPDATE statement using a collection of key-value pairs.
+        /// </summary>
+        /// <param name="assignments">Collection of new values. Each <see cref="KeyValuePair{string, object}"/> specifies the name of the column and its new value respectively.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="assignments"/> is null or empty.</exception>
+        public IFluentSqlUpdateSetStatement Set(Dictionary<string, object> assignments)
+        {
+            if (assignments == null || assignments.Count == 0)
+            {
+                throw new ArgumentException("Query must have at least one assignment");
+            }
+
+            string values = string.Empty;
+            foreach (var assignment in assignments)
+            {
+                string nameParameter = assignment.Key.StartsWith("@") ? assignment.Key.Remove(0, 1) : assignment.Key;
+                string valueParameter = assignment.Key.StartsWith("@") ? assignment.Key : $"@{assignment.Key}";
+                values += $"{nameParameter} = {valueParameter}, ";
+            }
+            values = values.Remove(values.Length - 2);
+
+            AddQueryParameters(assignments);
+            _query = $"{_query} SET {values}";
+            return this;
+        }
+
+        /// <summary>
+        /// Applies the WHERE operator using the specified condition.
+        /// </summary>
+        /// <param name="condition">Filter condition.</param>
+        /// <param name="parameters">Collection of key-value pairs containing parameter names and values.</param>
+        IFluentSqlNonQueryWhereStatement IFluentSqlUpdateSetStatement.Where(string condition, Dictionary<string, object> parameters)
+        {
+            AddQueryParameters(parameters);
+            _query = $"{_query} WHERE {condition}";
+            return this;
+        }
+
+        #endregion
+
+        #region Delete
+
+        /// <summary>
+        /// Initializes a DELETE statement against the specified table.
+        /// </summary>
+        /// <param name="table">Table name.</param>
+        /// <returns></returns>
+        public IFluentSqlDeleteStatement DeleteFrom(string table)
+        {
+            _queryParameters = new DynamicParameters();
+            _query = $"DELETE FROM {table}";
+            return this;
+        }
+
+        /// <summary>
+        /// Applies the WHERE operator using the specified condition.
+        /// </summary>
+        /// <param name="condition">Filter condition.</param>
+        /// <param name="parameters">Collection of key-value pairs containing parameter names and values.</param>
+        IFluentSqlNonQueryWhereStatement IFluentSqlDeleteStatement.Where(string condition, Dictionary<string, object> parameters)
+        {
+            AddQueryParameters(parameters);
+            _query = $"{_query} WHERE {condition}";
+            return this;
+        }
+
+        #endregion
+
         #region End Methods
 
         #region Sync
@@ -555,6 +681,31 @@ namespace FluentSQL.Core
                 }
 
                 return connection.QueryFirstOrDefault<T>(_query, transaction: _transaction, commandTimeout: Timeout);
+            }
+            finally
+            {
+                if (_transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes the operation.
+        /// </summary>
+        /// <returns>Affected rows.</returns>
+        public int Execute()
+        {
+            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+
+                return connection.Execute(_query, _queryParameters, _transaction, Timeout);
             }
             finally
             {
@@ -671,201 +822,6 @@ namespace FluentSQL.Core
             }
         }
 
-        #endregion
-
-        #endregion
-
-        #endregion
-
-        #region CRUD
-
-        #region Insert
-
-        /// <summary>
-        /// Initializes an INSERT statement against the specified table.
-        /// </summary>
-        /// <param name="table">Name of the table.</param>
-        public IFluentSqlInsertStatement InsertInto(string table)
-        {
-            _query = $"INSERT INTO {table}";
-            return this;
-        }
-
-        /// <summary>
-        /// Indicates the columns to insert.
-        /// </summary>
-        /// <param name="columns">Name of the columns to be inserted.</param>
-        public IFluentSqlInsertColumnsStatement Columns(params string[] columns)
-        {
-            _query = $"{_query} ({string.Join(", ", columns)})";
-            return this;
-        }
-
-        /// <summary>
-        /// Indicates the values of the columns specified by <see cref="Columns(string[])"/>, or all columns.
-        /// </summary>
-        /// <param name="values">Values of the columns to be inserted.</param>
-        public IFluentSqlInsertValuesStatement Values(params object[] values)
-        {
-            string insertValues = string.Empty;
-            foreach (object value in values)
-            {
-                if (value == null)
-                {
-                    insertValues += $"NULL, ";
-                }
-                else if (value is string || value is char)
-                {
-                    insertValues += $"'{value}', ";
-                }
-                else if (value is DateTime valueDateTime)
-                {
-                    insertValues += $"'{valueDateTime:yyyy-MM-dd hh:mm:ss.fff}', ";
-                }
-                else if (value is bool valueBoolean)
-                {
-                    insertValues += $"{(valueBoolean ? "1" : "0")}, ";
-                }
-                else
-                {
-                    insertValues += $"{value}, ";
-                }
-            }
-            insertValues = insertValues.Remove(insertValues.Length - 2);
-
-            _query = $" {_query} VALUES ({insertValues})";
-            return this;
-        }
-
-        #endregion
-
-        #region Update
-
-        /// <summary>
-        /// Initializes an UPDATE statement against the specified table.
-        /// </summary>
-        /// <param name="table">Nombre de la tabla.</param>
-        public IFluentSqlUpdateStatement Update(string table)
-        {
-            _query = $"UPDATE {table}";
-            return this;
-        }
-
-        /// <summary>
-        /// Indicates the assignments to be done by the UPDATE statement using a collection of key-value pairs.
-        /// </summary>
-        /// <param name="assignments">Collection of new values. Each <see cref="KeyValuePair{string, object}"/> specifies the name of the column and its new value respectively.</param>
-        public IFluentSqlUpdateSetStatement Set(Dictionary<string, object> assignments)
-        {
-            string values = string.Empty;
-            foreach (var assignment in assignments)
-            {
-                if (assignment.Value == null)
-                {
-                    values += $"{assignment.Key} = NULL, ";
-                }
-                else if (assignment.Value is string || assignment.Value is char)
-                {
-                    values += $" {assignment.Key} = '{assignment.Value}', ";
-                }
-                else if (assignment.Value is DateTime valueDateTime)
-                {
-                    values += $" {assignment.Key} = '{valueDateTime:yyyy-MM-dd hh:mm:ss.fff}', ";
-                }
-                else if (assignment.Value is bool valueBoolean)
-                {
-                    values += $" {assignment.Key} = {(valueBoolean ? "1" : "0")}, ";
-                }
-                else
-                {
-                    values += $"{assignment.Key} = {assignment.Value}, ";
-                }
-            }
-            values = values.Remove(values.Length - 2);
-            _query = $"{_query} SET {values}";
-            return this;
-        }
-
-        /// <summary>
-        /// Indicates the assignments to be done by the UPDATE statement.
-        /// </summary>
-        /// <param name="assignments">Assignments in SQL syntax.</param>
-        public IFluentSqlUpdateSetStatement Set(params string[] assignments)
-        {
-            _query = $"{_query} SET {string.Join(", ", assignments)}";
-            return this;
-        }
-
-        /// <summary>
-        /// Applies the WHERE operator using the specified condition.
-        /// </summary>
-        /// <param name="condition">Filter condition.</param>
-        IFluentSqlNonQueryWhereStatement IFluentSqlUpdateSetStatement.Where(string condition)
-        {
-            _query = $"{_query} WHERE {condition}";
-            return this;
-        }
-
-        #endregion
-
-        #region Delete
-
-        /// <summary>
-        /// Initializes a DELETE statement against the specified table.
-        /// </summary>
-        /// <param name="table">Table name.</param>
-        /// <returns></returns>
-        public IFluentSqlDeleteStatement DeleteFrom(string table)
-        {
-            _query = $"DELETE FROM {table}";
-            return this;
-        }
-
-        /// <summary>
-        /// Applies the WHERE operator using the specified condition.
-        /// </summary>
-        /// <param name="condition">Filter condition.</param>
-        IFluentSqlNonQueryWhereStatement IFluentSqlDeleteStatement.Where(string condition)
-        {
-            _query = $"{_query} WHERE {condition}";
-            return this;
-        }
-
-        #endregion
-
-        #region End Method
-
-        #region Sync
-
-        /// <summary>
-        /// Executes the operation.
-        /// </summary>
-        /// <returns>Affected rows.</returns>
-        public int Execute()
-        {
-            IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
-            try
-            {
-                if (connection.State == ConnectionState.Closed)
-                {
-                    connection.Open();
-                }
-
-                return connection.Execute(_query, transaction: _transaction, commandTimeout: Timeout);
-            }
-            finally
-            {
-                if (_transaction == null)
-                {
-                    connection.Dispose();
-                }
-            }
-        }
-
-        #endregion
-
-        #region Async
-
         /// <summary>
         /// Executes the operation asynchronously.
         /// </summary>
@@ -880,7 +836,7 @@ namespace FluentSQL.Core
                     connection.Open();
                 }
 
-                return await connection.ExecuteAsync(_query, transaction: _transaction, commandTimeout: Timeout);
+                return await connection.ExecuteAsync(_query, _queryParameters, _transaction, Timeout);
             }
             finally
             {
@@ -892,6 +848,26 @@ namespace FluentSQL.Core
         }
 
         #endregion
+
+        #endregion
+
+        #region Private
+
+        /// <summary>
+        /// Adds the specified parameters to the query parameter collection.
+        /// </summary>
+        /// <param name="parameters">Parameters to add.</param>
+        private void AddQueryParameters(Dictionary<string, object> parameters)
+        {
+            if (parameters != null)
+            {
+                foreach (var parameter in parameters)
+                {
+                    string nameParameter = parameter.Key.StartsWith("@") ? parameter.Key : $"@{parameter.Key}";
+                    _queryParameters.Add(nameParameter, parameter.Value);
+                }
+            }
+        }
 
         #endregion
 

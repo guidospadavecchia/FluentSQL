@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FluentSQL.Core
 {
@@ -7,7 +8,7 @@ namespace FluentSQL.Core
         string Query { get; }
         int? Timeout { get; }
 
-        IFluentSqlNonQueryWhereStatement Where(string condition);
+        IFluentSqlNonQueryWhereStatement Where(string condition, Dictionary<string, object> parameters);
 
         int Execute();
         Task<int> ExecuteAsync();
