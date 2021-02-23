@@ -2,6 +2,9 @@
 
 namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a non-blocking SELECT statement with a FROM clause.
+    /// </summary>
     public interface IFluentSqlSelectFromWithNoLockStatement : IFluentSqlQueryEnd
     {
         /// <summary>

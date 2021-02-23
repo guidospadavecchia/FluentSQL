@@ -2,6 +2,9 @@
 
 namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents an INSERT statement with VALUES.
+    /// </summary>
     public interface IFluentSqlInsertValuesStatement
     {
         /// <summary>

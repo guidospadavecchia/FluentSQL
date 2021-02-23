@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Description>The Fluent API for Dapper &amp; ADO.NET</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/guidospadavecchia/FluentSQL/tree/main/src/FluentSQL.Core</PackageProjectUrl>

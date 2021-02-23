@@ -2,6 +2,9 @@
 
 namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a non-blocking SELECT statement with a JOIN ON clause.
+    /// </summary>
     public interface IFluentSqlSelectJoinOnWithNoLockStatement : IFluentSqlQueryEnd
     {
         /// <summary>

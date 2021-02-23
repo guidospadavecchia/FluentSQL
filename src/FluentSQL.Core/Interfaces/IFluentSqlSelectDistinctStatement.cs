@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace FluentSQL.Core
+﻿namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a SELECT statement with a DISTINCT clause applied.
+    /// </summary>
     public interface IFluentSqlSelectDistinctStatement : IFluentSqlQueryEnd
     {
         /// <summary>

@@ -1,5 +1,8 @@
 ﻿namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a SELECT statement with an ORDER BY clause.
+    /// </summary>
     public interface IFluentSqlSelectOrderByStatement : IFluentSqlQueryEnd
     {
         /// <summary>

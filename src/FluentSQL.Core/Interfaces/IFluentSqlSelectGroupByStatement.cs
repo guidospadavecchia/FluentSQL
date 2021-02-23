@@ -2,6 +2,9 @@
 
 namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a SELECT statement with a GROUP BY clause.
+    /// </summary>
     public interface IFluentSqlSelectGroupByStatement : IFluentSqlQueryEnd
     {
         /// <summary>

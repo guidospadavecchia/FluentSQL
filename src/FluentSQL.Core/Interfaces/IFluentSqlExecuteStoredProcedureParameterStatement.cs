@@ -3,6 +3,9 @@ using System.Data;
 
 namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a Stored Procedure execution with parameters.
+    /// </summary>
     public interface IFluentSqlExecuteStoredProcedureParameterStatement : IFluentSqlStoredProcedureEnd
     {
         /// <summary>

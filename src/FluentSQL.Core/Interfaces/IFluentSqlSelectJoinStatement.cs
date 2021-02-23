@@ -2,6 +2,9 @@
 
 namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a SELECT statement with a JOIN clause.
+    /// </summary>
     public interface IFluentSqlSelectJoinStatement
     {
         /// <summary>

@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a query ready to be executed.
+    /// </summary>
     public interface IFluentSqlQueryEnd
     {
         /// <summary>

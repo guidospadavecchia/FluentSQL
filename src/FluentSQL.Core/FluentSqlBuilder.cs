@@ -33,6 +33,7 @@ namespace FluentSQL.Core
 
         #region Properties
 
+        /// <inheritdoc />
         public int? Timeout
         {
             get
@@ -41,6 +42,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public string Query
         {
             get
@@ -49,6 +51,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public string Name
         {
             get
@@ -57,6 +60,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public bool InTransaction
         {
             get
@@ -253,6 +257,7 @@ namespace FluentSQL.Core
 
         #region Select
 
+        /// <inheritdoc />
         public IFluentSqlSelectStatement Select(params string[] columns)
         {
             _queryParameters = new DynamicParameters();
@@ -260,6 +265,7 @@ namespace FluentSQL.Core
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectStatement SelectAll()
         {
             _queryParameters = new DynamicParameters();
@@ -267,36 +273,42 @@ namespace FluentSQL.Core
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectDistinctStatement Distinct()
         {
             _query = new Regex("SELECT").Replace(_query, "SELECT DISTINCT", 1);
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectTopStatement Top(int rows)
         {
             _query = new Regex("SELECT").Replace(_query, $"SELECT TOP {rows}", 1);
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectFromStatement From(string table)
         {
             _query = $"{_query} FROM {table}";
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectFromStatement From(string table, string tableAlias)
         {
             _query = $"{_query} FROM {table} {tableAlias}";
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectFromWithNoLockStatement WithNoLock()
         {
             _query = $"{_query} WITH (NOLOCK)";
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectJoinStatement Join(string table, JoinTypes joinType)
         {
             string joinTypeName = joinType switch
@@ -311,6 +323,7 @@ namespace FluentSQL.Core
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectJoinStatement Join(string table, string tableAlias, JoinTypes joinType)
         {
             string joinTypeName = joinType switch
@@ -325,84 +338,98 @@ namespace FluentSQL.Core
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectJoinOnStatement On(string condition)
         {
             _query = $"{_query} ON {condition}";
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectJoinOnStatement On(string condition, Dictionary<string, object> parameters)
         {
             AddQueryParameters(parameters);
             return On(condition);
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectJoinOnStatement On(string condition, object parameters)
         {
             AddQueryParameters(parameters);
             return On(condition);
         }
 
+        /// <inheritdoc />
         IFluentSqlSelectJoinOnWithNoLockStatement IFluentSqlSelectJoinOnStatement.WithNoLock()
         {
             _query = $"{_query} WITH (NOLOCK)";
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectWhereStatement Where(string condition)
         {
             _query = $"{_query} WHERE {condition}";
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectWhereStatement Where(string condition, Dictionary<string, object> parameters)
         {
             AddQueryParameters(parameters);
             return Where(condition);
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectWhereStatement Where(string condition, object parameters)
         {
             AddQueryParameters(parameters);
             return Where(condition);
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectGroupByStatement GroupBy(params string[] columns)
         {
             _query = $"{_query} GROUP BY {string.Join(", ", columns)}";
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectGroupByHavingStatement Having(string condition)
         {
             _query = $"{_query} HAVING {condition}";
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectGroupByHavingStatement Having(string condition, Dictionary<string, object> parameters)
         {
             AddQueryParameters(parameters);
             return Having(condition);
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectGroupByHavingStatement Having(string condition, object parameters)
         {
             AddQueryParameters(parameters);
             return Having(condition);
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectOrderByStatement OrderBy(params string[] columns)
         {
             _query = $"{_query} ORDER BY {string.Join(", ", columns)}";
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectOrderByAscendingDescendingStatement Ascending()
         {
             _query = $"{_query} ASC";
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlSelectOrderByAscendingDescendingStatement Descending()
         {
             _query = $"{_query} DESC";
@@ -413,6 +440,7 @@ namespace FluentSQL.Core
 
         #region Insert
 
+        /// <inheritdoc />
         public IFluentSqlInsertStatement InsertInto(string table)
         {
             _queryParameters = new DynamicParameters();
@@ -420,6 +448,7 @@ namespace FluentSQL.Core
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlInsertValuesStatement Values(Dictionary<string, object> values)
         {
             if (values == null || values.Count == 0)
@@ -446,6 +475,7 @@ namespace FluentSQL.Core
 
         #region Update
 
+        /// <inheritdoc />
         public IFluentSqlUpdateStatement Update(string table)
         {
             _queryParameters = new DynamicParameters();
@@ -453,6 +483,7 @@ namespace FluentSQL.Core
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlUpdateSetStatement Set(Dictionary<string, object> assignments)
         {
             if (assignments == null || assignments.Count == 0)
@@ -474,12 +505,14 @@ namespace FluentSQL.Core
             return this;
         }
 
+        /// <inheritdoc />
         IFluentSqlNonQueryWhereStatement IFluentSqlUpdateSetStatement.Where(string condition)
         {
             _query = $"{_query} WHERE {condition}";
             return this;
         }
 
+        /// <inheritdoc />
         IFluentSqlNonQueryWhereStatement IFluentSqlUpdateSetStatement.Where(string condition, Dictionary<string, object> parameters)
         {
             AddQueryParameters(parameters);
@@ -487,6 +520,7 @@ namespace FluentSQL.Core
             return this;
         }
 
+        /// <inheritdoc />
         IFluentSqlNonQueryWhereStatement IFluentSqlUpdateSetStatement.Where(string condition, object parameters)
         {
             AddQueryParameters(parameters);
@@ -498,6 +532,7 @@ namespace FluentSQL.Core
 
         #region Delete
 
+        /// <inheritdoc />
         public IFluentSqlDeleteStatement DeleteFrom(string table)
         {
             _queryParameters = new DynamicParameters();
@@ -505,12 +540,14 @@ namespace FluentSQL.Core
             return this;
         }
 
+        /// <inheritdoc />
         IFluentSqlNonQueryWhereStatement IFluentSqlDeleteStatement.Where(string condition)
         {
             _query = $"{_query} WHERE {condition}";
             return this;
         }
 
+        /// <inheritdoc />
         IFluentSqlNonQueryWhereStatement IFluentSqlDeleteStatement.Where(string condition, Dictionary<string, object> parameters)
         {
             AddQueryParameters(parameters);
@@ -518,6 +555,7 @@ namespace FluentSQL.Core
             return this;
         }
 
+        /// <inheritdoc />
         IFluentSqlNonQueryWhereStatement IFluentSqlDeleteStatement.Where(string condition, object parameters)
         {
             AddQueryParameters(parameters);
@@ -531,6 +569,7 @@ namespace FluentSQL.Core
 
         #region Sync
 
+        /// <inheritdoc />
         public IEnumerable<dynamic> ToDynamic()
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -552,6 +591,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public dynamic ToDynamicSingle()
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -573,6 +613,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public IEnumerable<T> ToMappedObject<T>()
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -594,6 +635,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public T ToMappedObjectSingle<T>()
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -615,6 +657,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public int Execute()
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -640,6 +683,7 @@ namespace FluentSQL.Core
 
         #region Async
 
+        /// <inheritdoc />
         public async Task<IEnumerable<dynamic>> ToDynamicAsync()
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -661,6 +705,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<dynamic> ToDynamicSingleAsync()
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -682,6 +727,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<T>> ToMappedObjectAsync<T>()
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -703,6 +749,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<T> ToMappedObjectSingleAsync<T>()
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -724,6 +771,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<int> ExecuteAsync()
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -782,6 +830,7 @@ namespace FluentSQL.Core
 
         #region StoredProcedure
 
+        /// <inheritdoc />
         public IFluentSqlExecuteStoredProcedureStatement StoreProcedure(string name)
         {
             _spName = name;
@@ -790,6 +839,7 @@ namespace FluentSQL.Core
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlExecuteStoredProcedureParameterStatement WithParameters(Dictionary<string, object> parameters)
         {
             foreach (var parameter in parameters)
@@ -799,42 +849,49 @@ namespace FluentSQL.Core
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlExecuteStoredProcedureParameterStatement WithParameter(string name, object value)
         {
             _spParameters.Add(name, value);
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlExecuteStoredProcedureOutputParameterStatement WithOutputParameters(IEnumerable<OutputParameter> parameters)
         {
             _spOutputParameters.AddRange(parameters);
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlExecuteStoredProcedureOutputParameterStatement WithOutputParameter(OutputParameter parameter)
         {
             _spOutputParameters.Add(parameter);
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlExecuteStoredProcedureOutputParameterStatement WithOutputParameter(string name, DbType type)
         {
             _spOutputParameters.Add(new OutputParameter(name, type));
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlExecuteStoredProcedureOutputParameterStatement WithOutputParameter(string name, DbType type, int size)
         {
             _spOutputParameters.Add(new OutputParameter(name, type, size));
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlExecuteStoredProcedureOutputParameterStatement WithOutputParameter(string name, DbType type, byte precision, byte scale)
         {
             _spOutputParameters.Add(new OutputParameter(name, type, precision, scale));
             return this;
         }
 
+        /// <inheritdoc />
         public IFluentSqlExecuteStoredProcedureOutputParameterStatement WithOutputParameter(string name, DbType type, int? size = null, byte? precision = null, byte? scale = null)
         {
             _spOutputParameters.Add(new OutputParameter(name, type, size, precision, scale));
@@ -845,6 +902,7 @@ namespace FluentSQL.Core
 
         #region Sync
 
+        /// <inheritdoc />
         public int ExecuteNonQuery()
         {
             var parameters = CreateDynamicParameters();
@@ -867,6 +925,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public IEnumerable<dynamic> ExecuteToDynamic()
         {
             var parameters = CreateDynamicParameters();
@@ -889,6 +948,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public dynamic ExecuteToDynamicSingle()
         {
             var parameters = CreateDynamicParameters();
@@ -911,6 +971,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public IEnumerable<T> ExecuteToMappedObject<T>()
         {
             var parameters = CreateDynamicParameters();
@@ -933,6 +994,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public T ExecuteToMappedObjectSingle<T>()
         {
             var parameters = CreateDynamicParameters();
@@ -955,6 +1017,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         StoredProcedureWithOutputResult<int> IFluentSqlStoredProcedureWithOutputEnd.ExecuteNonQuery()
         {
             var parameters = CreateDynamicParameters();
@@ -978,6 +1041,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         StoredProcedureWithOutputResult<IEnumerable<dynamic>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToDynamic()
         {
             var parameters = CreateDynamicParameters();
@@ -1000,6 +1064,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         StoredProcedureWithOutputResult<dynamic> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToDynamicSingle()
         {
             var parameters = CreateDynamicParameters();
@@ -1022,6 +1087,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         StoredProcedureWithOutputResult<IEnumerable<T>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToMappedObject<T>()
         {
             var parameters = CreateDynamicParameters();
@@ -1044,6 +1110,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         StoredProcedureWithOutputResult<T> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToMappedObjectSingle<T>()
         {
             var parameters = CreateDynamicParameters();
@@ -1070,6 +1137,7 @@ namespace FluentSQL.Core
 
         #region Async
 
+        /// <inheritdoc />
         public async Task<int> ExecuteNonQueryAsync()
         {
             var parameters = CreateDynamicParameters();
@@ -1092,6 +1160,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<dynamic>> ExecuteToDynamicAsync()
         {
             var parameters = CreateDynamicParameters();
@@ -1114,6 +1183,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<dynamic> ExecuteToDynamicSingleAsync()
         {
             var parameters = CreateDynamicParameters();
@@ -1136,6 +1206,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<T>> ExecuteToMappedObjectAsync<T>()
         {
             var parameters = CreateDynamicParameters();
@@ -1158,6 +1229,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<T> ExecuteToMappedObjectSingleAsync<T>()
         {
             var parameters = CreateDynamicParameters();
@@ -1180,6 +1252,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         async Task<StoredProcedureWithOutputResult<int>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteNonQueryAsync()
         {
             var parameters = CreateDynamicParameters();
@@ -1203,6 +1276,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         async Task<StoredProcedureWithOutputResult<IEnumerable<dynamic>>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToDynamicAsync()
         {
             var parameters = CreateDynamicParameters();
@@ -1225,6 +1299,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         async Task<StoredProcedureWithOutputResult<dynamic>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToDynamicSingleAsync()
         {
             var parameters = CreateDynamicParameters();
@@ -1247,6 +1322,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         async Task<StoredProcedureWithOutputResult<IEnumerable<T>>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToMappedObjectAsync<T>()
         {
             var parameters = CreateDynamicParameters();
@@ -1269,6 +1345,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         async Task<StoredProcedureWithOutputResult<T>> IFluentSqlStoredProcedureWithOutputEnd.ExecuteToMappedObjectSingleAsync<T>()
         {
             var parameters = CreateDynamicParameters();
@@ -1346,6 +1423,7 @@ namespace FluentSQL.Core
 
         #region Sync
 
+        /// <inheritdoc />
         public int ExecuteCustomNonQuery(string sqlQuery)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1366,6 +1444,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public int ExecuteCustomNonQuery(string sqlQuery, object parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1386,6 +1465,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public int ExecuteCustomNonQuery(string sqlQuery, Dictionary<string, object> parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1406,6 +1486,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public IEnumerable<dynamic> ExecuteCustomQuery(string sqlQuery)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1426,6 +1507,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public IEnumerable<dynamic> ExecuteCustomQuery(string sqlQuery, object parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1446,6 +1528,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public IEnumerable<dynamic> ExecuteCustomQuery(string sqlQuery, Dictionary<string, object> parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1466,6 +1549,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public dynamic ExecuteCustomQuerySingle(string sqlQuery)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1486,6 +1570,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public dynamic ExecuteCustomQuerySingle(string sqlQuery, object parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1506,6 +1591,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public dynamic ExecuteCustomQuerySingle(string sqlQuery, Dictionary<string, object> parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1526,6 +1612,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public IEnumerable<T> ExecuteCustomQuery<T>(string sqlQuery)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1546,6 +1633,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public IEnumerable<T> ExecuteCustomQuery<T>(string sqlQuery, object parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1566,6 +1654,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public IEnumerable<T> ExecuteCustomQuery<T>(string sqlQuery, Dictionary<string, object> parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1586,6 +1675,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public T ExecuteCustomQuerySingle<T>(string sqlQuery)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1606,6 +1696,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public T ExecuteCustomQuerySingle<T>(string sqlQuery, object parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1625,7 +1716,8 @@ namespace FluentSQL.Core
                 }
             }
         }
-        
+
+        /// <inheritdoc />
         public T ExecuteCustomQuerySingle<T>(string sqlQuery, Dictionary<string, object> parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1650,6 +1742,7 @@ namespace FluentSQL.Core
 
         #region Async
 
+        /// <inheritdoc />
         public async Task<int> ExecuteCustomNonQueryAsync(string sqlQuery)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1670,6 +1763,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<int> ExecuteCustomNonQueryAsync(string sqlQuery, object parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1690,6 +1784,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<int> ExecuteCustomNonQueryAsync(string sqlQuery, Dictionary<string, object> parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1710,6 +1805,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<dynamic>> ExecuteCustomQueryAsync(string sqlQuery)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1730,6 +1826,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<dynamic>> ExecuteCustomQueryAsync(string sqlQuery, object parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1750,6 +1847,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<dynamic>> ExecuteCustomQueryAsync(string sqlQuery, Dictionary<string, object> parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1770,6 +1868,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<dynamic> ExecuteCustomQuerySingleAsync(string sqlQuery)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1790,6 +1889,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<dynamic> ExecuteCustomQuerySingleAsync(string sqlQuery, object parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1810,6 +1910,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<dynamic> ExecuteCustomQuerySingleAsync(string sqlQuery, Dictionary<string, object> parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1830,6 +1931,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<T>> ExecuteCustomQueryAsync<T>(string sqlQuery)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1850,6 +1952,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<T>> ExecuteCustomQueryAsync<T>(string sqlQuery, object parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1870,6 +1973,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<T>> ExecuteCustomQueryAsync<T>(string sqlQuery, Dictionary<string, object> parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1890,6 +1994,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<T> ExecuteCustomQuerySingleAsync<T>(string sqlQuery)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1910,6 +2015,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<T> ExecuteCustomQuerySingleAsync<T>(string sqlQuery, object parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);
@@ -1930,6 +2036,7 @@ namespace FluentSQL.Core
             }
         }
 
+        /// <inheritdoc />
         public async Task<T> ExecuteCustomQuerySingleAsync<T>(string sqlQuery, Dictionary<string, object> parameters)
         {
             IDbConnection connection = _transaction?.Connection ?? new SqlConnection(_connectionString);

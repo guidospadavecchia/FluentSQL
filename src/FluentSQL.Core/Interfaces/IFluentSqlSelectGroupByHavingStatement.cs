@@ -1,5 +1,8 @@
 ﻿namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a SELECT statement with a filtered GROUP BY clause.
+    /// </summary>
     public interface IFluentSqlSelectGroupByHavingStatement : IFluentSqlQueryEnd
     {
         /// <summary>

@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a DELETE statement.
+    /// </summary>
     public interface IFluentSqlDeleteStatement
     {
         /// <summary>

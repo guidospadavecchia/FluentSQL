@@ -1,5 +1,8 @@
 ﻿namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a SELECT statement.
+    /// </summary>
     public interface IFluentSqlSelectStatement : IFluentSqlQueryEnd
     {
         /// <summary>

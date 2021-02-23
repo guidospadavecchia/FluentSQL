@@ -2,6 +2,9 @@
 
 namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a filtered non-query statement.
+    /// </summary>
     public interface IFluentSqlNonQueryWhereStatement
     {
         /// <summary>

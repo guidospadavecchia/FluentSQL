@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents an INSERT statement.
+    /// </summary>
     public interface IFluentSqlInsertStatement
     {
         /// <summary>

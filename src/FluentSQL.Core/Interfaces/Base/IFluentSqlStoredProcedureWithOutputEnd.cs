@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a Stored Procedure with output parameters ready to be executed.
+    /// </summary>
     public interface IFluentSqlStoredProcedureWithOutputEnd
     {
         /// <summary>

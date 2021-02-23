@@ -1,5 +1,8 @@
 ﻿namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a SELECT statement with the TOP clause applied.
+    /// </summary>
     public interface IFluentSqlSelectTopStatement : IFluentSqlQueryEnd
     {
         /// <summary>

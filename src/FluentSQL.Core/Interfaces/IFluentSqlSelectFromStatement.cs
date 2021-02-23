@@ -2,6 +2,9 @@
 
 namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a SELECT statement with a FROM clause.
+    /// </summary>
     public interface IFluentSqlSelectFromStatement : IFluentSqlQueryEnd
     {
         /// <summary>

@@ -1,5 +1,8 @@
 ﻿namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a SELECT statement with an ORDER BY ASCENDING/DESCENDING clause.
+    /// </summary>
     public interface IFluentSqlSelectOrderByAscendingDescendingStatement : IFluentSqlQueryEnd
     {
         /// <summary>

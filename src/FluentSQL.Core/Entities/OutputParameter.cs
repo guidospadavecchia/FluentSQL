@@ -35,7 +35,7 @@ namespace FluentSQL.Core
         /// <param name="type">Data type of the output parameter.</param>
         public OutputParameter(string name, DbType type)
         {
-            Name = name.StartsWith("@") ? name.Substring(1) : name;
+            Name = name.StartsWith("@") ? name[1..] : name;
             Type = type;
         }
 
@@ -47,7 +47,7 @@ namespace FluentSQL.Core
         /// <param name="size">Size of the output parameter. Must be specified if <paramref name="type"/> is any variant of <see cref="DbType.String"/> or <see cref="DbType.Binary"/>.</param>
         public OutputParameter(string name, DbType type, int size)
         {
-            Name = name.StartsWith("@") ? name.Substring(1) : name;
+            Name = name.StartsWith("@") ? name[1..] : name;
             Type = type;
             Size = size;
         }
@@ -61,7 +61,7 @@ namespace FluentSQL.Core
         /// <param name="scale">Numeric scale of the output parameter. Must be specified when the parameter is any kind of number with decimals.</param>
         public OutputParameter(string name, DbType type, byte precision, byte scale)
         {
-            Name = name.StartsWith("@") ? name.Substring(1) : name;
+            Name = name.StartsWith("@") ? name[1..] : name;
             Type = type;
             Precision = precision;
             Scale = scale;
@@ -77,7 +77,7 @@ namespace FluentSQL.Core
         /// <param name="scale">Escala numérica del parámetro. Must be specified when the parameter is any kind of number with decimals.</param>
         public OutputParameter(string name, DbType type, int? size = null, byte? precision = null, byte? scale = null)
         {
-            Name = name.StartsWith("@") ? name.Substring(1) : name;
+            Name = name.StartsWith("@") ? name[1..] : name;
             Type = type;
             Size = size;
             Precision = precision;

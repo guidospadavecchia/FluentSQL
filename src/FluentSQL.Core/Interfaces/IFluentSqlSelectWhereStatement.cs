@@ -1,5 +1,8 @@
 ﻿namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents a filtered SELECT statement.
+    /// </summary>
     public interface IFluentSqlSelectWhereStatement : IFluentSqlQueryEnd
     {
         /// <summary>

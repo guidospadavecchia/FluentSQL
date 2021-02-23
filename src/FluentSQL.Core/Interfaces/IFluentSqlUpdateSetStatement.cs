@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace FluentSQL.Core
 {
+    /// <summary>
+    /// Represents an UPDATE statement with the SET clause applied.
+    /// </summary>
     public interface IFluentSqlUpdateSetStatement
     {
         /// <summary>
