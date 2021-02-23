@@ -18,8 +18,19 @@ namespace FluentSQL.Core
         /// Applies the WHERE operator using the specified condition.
         /// </summary>
         /// <param name="condition">Filter condition.</param>
+        IFluentSqlNonQueryWhereStatement Where(string condition);
+        /// <summary>
+        /// Applies the WHERE operator using the specified condition.
+        /// </summary>
+        /// <param name="condition">Filter condition.</param>
         /// <param name="parameters">Collection of key-value pairs containing parameter names and values.</param>
         IFluentSqlNonQueryWhereStatement Where(string condition, Dictionary<string, object> parameters);
+        /// <summary>
+        /// Applies the WHERE operator using the specified condition.
+        /// </summary>
+        /// <param name="condition">Filter condition.</param>
+        /// <param name="parameters">Object containing parameter names and values.</param>
+        IFluentSqlNonQueryWhereStatement Where(string condition, object parameters);
 
         /// <summary>
         /// Executes the operation.

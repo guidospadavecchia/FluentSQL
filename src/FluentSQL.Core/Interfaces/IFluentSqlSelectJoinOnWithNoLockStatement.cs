@@ -25,6 +25,12 @@ namespace FluentSQL.Core
         /// <param name="parameters">Collection of key-value pairs containing parameter names and values.</param>
         IFluentSqlSelectWhereStatement Where(string condition, Dictionary<string, object> parameters);
         /// <summary>
+        /// Applies the WHERE operator using the specified condition.
+        /// </summary>
+        /// <param name="condition">Filter condition.</param>
+        /// <param name="parameters">Object containing parameter names and values.</param>
+        IFluentSqlSelectWhereStatement Where(string condition, object parameters);
+        /// <summary>
         /// Applies the GROUP BY operator for the specified columns.
         /// </summary>
         /// <param name="columns">Columns to group by.</param>

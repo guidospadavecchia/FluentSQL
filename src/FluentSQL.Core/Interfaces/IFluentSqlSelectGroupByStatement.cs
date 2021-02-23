@@ -25,6 +25,12 @@ namespace FluentSQL.Core
         /// <param name="parameters">Collection of key-value pairs containing parameter names and values.</param>
         IFluentSqlSelectGroupByHavingStatement Having(string condition, Dictionary<string, object> parameters);
         /// <summary>
+        /// Applies the HAVING keyword after a GROUP BY, using the specified condition.
+        /// </summary>
+        /// <param name="condition">Filter GROUP BY condition.</param>
+        /// <param name="parameters">Object containing parameter names and values.</param>
+        IFluentSqlSelectGroupByHavingStatement Having(string condition, object parameters);
+        /// <summary>
         /// Applies the ORDER BY operator, sorting the results by the specified columns.
         /// </summary>
         /// <param name="columns">Columns to sort by.</param>

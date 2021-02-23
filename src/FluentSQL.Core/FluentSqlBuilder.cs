@@ -337,6 +337,12 @@ namespace FluentSQL.Core
             return On(condition);
         }
 
+        public IFluentSqlSelectJoinOnStatement On(string condition, object parameters)
+        {
+            AddQueryParameters(parameters);
+            return On(condition);
+        }
+
         IFluentSqlSelectJoinOnWithNoLockStatement IFluentSqlSelectJoinOnStatement.WithNoLock()
         {
             _query = $"{_query} WITH (NOLOCK)";
@@ -355,6 +361,12 @@ namespace FluentSQL.Core
             return Where(condition);
         }
 
+        public IFluentSqlSelectWhereStatement Where(string condition, object parameters)
+        {
+            AddQueryParameters(parameters);
+            return Where(condition);
+        }
+
         public IFluentSqlSelectGroupByStatement GroupBy(params string[] columns)
         {
             _query = $"{_query} GROUP BY {string.Join(", ", columns)}";
@@ -368,6 +380,12 @@ namespace FluentSQL.Core
         }
 
         public IFluentSqlSelectGroupByHavingStatement Having(string condition, Dictionary<string, object> parameters)
+        {
+            AddQueryParameters(parameters);
+            return Having(condition);
+        }
+
+        public IFluentSqlSelectGroupByHavingStatement Having(string condition, object parameters)
         {
             AddQueryParameters(parameters);
             return Having(condition);
@@ -456,7 +474,20 @@ namespace FluentSQL.Core
             return this;
         }
 
+        IFluentSqlNonQueryWhereStatement IFluentSqlUpdateSetStatement.Where(string condition)
+        {
+            _query = $"{_query} WHERE {condition}";
+            return this;
+        }
+
         IFluentSqlNonQueryWhereStatement IFluentSqlUpdateSetStatement.Where(string condition, Dictionary<string, object> parameters)
+        {
+            AddQueryParameters(parameters);
+            _query = $"{_query} WHERE {condition}";
+            return this;
+        }
+
+        IFluentSqlNonQueryWhereStatement IFluentSqlUpdateSetStatement.Where(string condition, object parameters)
         {
             AddQueryParameters(parameters);
             _query = $"{_query} WHERE {condition}";
@@ -474,7 +505,20 @@ namespace FluentSQL.Core
             return this;
         }
 
+        IFluentSqlNonQueryWhereStatement IFluentSqlDeleteStatement.Where(string condition)
+        {
+            _query = $"{_query} WHERE {condition}";
+            return this;
+        }
+
         IFluentSqlNonQueryWhereStatement IFluentSqlDeleteStatement.Where(string condition, Dictionary<string, object> parameters)
+        {
+            AddQueryParameters(parameters);
+            _query = $"{_query} WHERE {condition}";
+            return this;
+        }
+
+        IFluentSqlNonQueryWhereStatement IFluentSqlDeleteStatement.Where(string condition, object parameters)
         {
             AddQueryParameters(parameters);
             _query = $"{_query} WHERE {condition}";
@@ -721,6 +765,15 @@ namespace FluentSQL.Core
                     _queryParameters.Add(nameParameter, parameter.Value);
                 }
             }
+        }
+
+        /// <summary>
+        /// Adds the specified parameters to the query parameter collection.
+        /// </summary>
+        /// <param name="parameters">Parameters to add.</param>
+        private void AddQueryParameters(object parameters)
+        {
+            _queryParameters.AddDynamicParams(parameters);
         }
 
         #endregion
