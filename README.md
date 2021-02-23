@@ -84,14 +84,11 @@ IEnumerable<dynamic> result = fsql.SelectAll()
                                   .ToDynamic();
 ```
 ```csharp
-Dictionary<string, object> whereParameters = new Dictionary<string, object>();
-whereParameters.Add("Id", 5);
-
 IEnumerable<dynamic> result = fsql.SelectAll()
                                   .Distinct()
                                   .Top(100)
                                   .From("Customers")
-                                  .Where("ID > @Id", whereParameters)
+                                  .Where("ID > @Id", new { Id = 5 })
                                   .ToDynamic();
 ```
 
@@ -134,11 +131,9 @@ public class CustomerDTO
     public DateTime CreationDate;
 }
 
-Dictionary<string, object> whereParameters = new Dictionary<string, object>();
-whereParameters.Add("Ids", new [] { 1, 2, 3 });
 IEnumerable<CustomerDTO> result = fsql.SelectAll()
                                       .From("Customers")
-                                      .Where("ID IN @Ids", whereParameters)
+                                      .Where("ID IN @Ids", new { Ids = new [] { 1, 2, 3 } })
                                       .ToMappedObject<CustomerDTO>();
                                       
 CustomerDTO firstCustomer = lista.ElementAt(0);
@@ -176,12 +171,9 @@ Dictionary<string, object> assignments = new Dictionary<string, object>();
 assignments.Add("Description", "U.S. Dollar");
 assignments.Add("Code", "US");
 
-Dictionary<string, object> whereParameters = new Dictionary<string, object>();
-whereParameters.Add("Id", 2);
-
 int affectedRows = fsql.Update("Currencies")
                        .Set(assignments)
-                       .Where("ID = @Id", whereParameters)
+                       .Where("ID = @Id", new { Id = 2 })
                        .Execute();
 ```
 
@@ -200,12 +192,8 @@ int affectedRows = fsql.Update("Currencies")
 ### Delete
 Returns the affected rows.
 ```csharp
-
-Dictionary<string, object> whereParameters = new Dictionary<string, object>();
-whereParameters.Add("Id", 2);
-
 int affectedRows = fsql.DeleteFrom("Currencies")
-                       .Where("ID = @Id", whereParameters)
+                       .Where("ID = @Id", new { Id = 2 })
                        .Execute();
 ```
 
