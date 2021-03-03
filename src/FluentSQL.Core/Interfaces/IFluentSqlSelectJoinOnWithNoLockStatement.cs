@@ -17,6 +17,19 @@ namespace FluentSQL.Core
         int? Timeout { get; }
 
         /// <summary>
+        /// Applies the JOIN operator specified by the <paramref name="joinType"/>, against the specified <paramref name="table"/>.
+        /// </summary>
+        /// <param name="table">Table to join with.</param>
+        /// <param name="joinType">The type of join to apply.</param>
+        IFluentSqlSelectJoinStatement Join(string table, JoinTypes joinType);
+        /// <summary>
+        /// Applies the JOIN operator specified by the <paramref name="joinType"/>, against the specified <paramref name="table"/>.
+        /// </summary>
+        /// <param name="table">Table to join with.</param>
+        /// <param name="tableAlias">Alias of the table to join with.</param>
+        /// <param name="joinType">The type of join to apply.</param>
+        IFluentSqlSelectJoinStatement Join(string table, string tableAlias, JoinTypes joinType);
+        /// <summary>
         /// Applies the WHERE operator using the specified condition.
         /// </summary>
         /// <param name="condition">Filter condition.</param>
