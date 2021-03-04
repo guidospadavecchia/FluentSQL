@@ -17,10 +17,6 @@ namespace FluentSQL.Core
         int? Timeout { get; }
 
         /// <summary>
-        /// Applies the WITH (NOLOCK) modifier, to read records without blocking the table.
-        /// </summary>
-        IFluentSqlSelectJoinOnWithNoLockStatement WithNoLock();
-        /// <summary>
         /// Applies the JOIN operator specified by the <paramref name="joinType"/>, against the specified <paramref name="table"/>.
         /// </summary>
         /// <param name="table">Table to join with.</param>

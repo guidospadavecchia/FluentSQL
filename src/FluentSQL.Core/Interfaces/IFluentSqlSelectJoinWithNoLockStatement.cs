@@ -3,14 +3,10 @@
 namespace FluentSQL.Core
 {
     /// <summary>
-    /// Represents a SELECT statement with a JOIN clause.
+    /// Represents a SELECT statement with a JOIN clause including the WITH (NOLOCK) modifier.
     /// </summary>
-    public interface IFluentSqlSelectJoinStatement
+    public interface IFluentSqlSelectJoinWithNoLockStatement
     {
-        /// <summary>
-        /// Applies the WITH (NOLOCK) modifier, to read records without blocking the table.
-        /// </summary>
-        IFluentSqlSelectJoinWithNoLockStatement WithNoLock();
         /// <summary>
         /// Applies the ON keyword after a JOIN, using the specified condition.
         /// </summary>
