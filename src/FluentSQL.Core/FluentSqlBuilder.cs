@@ -453,7 +453,7 @@ namespace FluentSQL.Core
         {
             if (values == null || values.Count == 0)
             {
-                throw new ArgumentException("Debe ejecutar la consulta con al menos un valor");
+                throw new ArgumentException("Query with INSERT statement must have at least one value");
             }
 
             _query = $"{_query} ({string.Join(", ", values.Select(x => x.Key))})";
@@ -469,6 +469,18 @@ namespace FluentSQL.Core
             AddQueryParameters(values);
             _query = $" {_query} VALUES ({insertValues})";
             return this;
+        }
+
+        /// <inheritdoc />
+        public IFluentSqlInsertValuesStatement Values(object valuesObject)
+        {
+            if (valuesObject == null)
+            {
+                throw new ArgumentException("Query with INSERT statement must have at least one value");
+            }
+
+            Dictionary<string, object> values = valuesObject.GetType().GetProperties().ToDictionary(x => x.Name, x => x.GetValue(valuesObject, null));
+            return Values(values);
         }
 
         #endregion
@@ -503,6 +515,18 @@ namespace FluentSQL.Core
             AddQueryParameters(assignments);
             _query = $"{_query} SET {values}";
             return this;
+        }
+
+        /// <inheritdoc />
+        public IFluentSqlUpdateSetStatement Set(object assignmentsObject)
+        {
+            if (assignmentsObject == null)
+            {
+                throw new ArgumentException("Query must have at least one assignment");
+            }
+
+            Dictionary<string, object> assignments = assignmentsObject.GetType().GetProperties().ToDictionary(x => x.Name, x => x.GetValue(assignmentsObject, null));
+            return Set(assignments);
         }
 
         /// <inheritdoc />
@@ -845,6 +869,20 @@ namespace FluentSQL.Core
             foreach (var parameter in parameters)
             {
                 _spParameters.Add(parameter.Key, parameter.Value);
+            }
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IFluentSqlExecuteStoredProcedureParameterStatement WithParameters(object parametersObject)
+        {
+            if (parametersObject != null)
+            {
+                Dictionary<string, object> parameters = parametersObject.GetType().GetProperties().ToDictionary(x => x.Name, x => x.GetValue(parametersObject, null));
+                foreach (var parameter in parameters)
+                {
+                    _spParameters.Add(parameter.Key, parameter.Value);
+                }
             }
             return this;
         }

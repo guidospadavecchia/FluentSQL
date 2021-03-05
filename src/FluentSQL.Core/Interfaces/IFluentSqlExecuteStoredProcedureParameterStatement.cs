@@ -23,6 +23,11 @@ namespace FluentSQL.Core
         /// <param name="parameters">Collection of key-value pairs, with the parameter name and value respectively.</param>
         IFluentSqlExecuteStoredProcedureParameterStatement WithParameters(Dictionary<string, object> parameters);
         /// <summary>
+        /// Adds the specified <paramref name="parametersObject"/> to the collection.
+        /// </summary>
+        /// <param name="parametersObject">Object with properties containing parameter names and values.</param>
+        IFluentSqlExecuteStoredProcedureParameterStatement WithParameters(object parametersObject);
+        /// <summary>
         /// Adds the specified parameter to the collection.
         /// </summary>
         /// <param name="name">Name of the parameter..</param>
